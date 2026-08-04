@@ -3,17 +3,21 @@ import { AssetButton } from "./AssetButton";
 import { BTN } from "@/game/assets";
 import { speakEnglish, stopSpeaking } from "@/game/speech";
 
-/** Lê em voz alta apenas a frase em inglês da tela. */
+/** Lê em voz alta apenas frases completas e corretas em inglês. */
 export function AudioButton({
   text,
   left,
   bottom = 24,
   width = 158,
+  label,
+  disabled = false,
 }: {
   text: string;
   left: number;
   bottom?: number;
   width?: number;
+  label?: string;
+  disabled?: boolean;
 }) {
   const [speaking, setSpeaking] = useState(false);
 
@@ -27,10 +31,11 @@ export function AudioButton({
       <AssetButton
         src={BTN.audio}
         width={width}
+        disabled={disabled}
         label={
           speaking
-            ? `Parar a leitura da frase em inglês: ${text}`
-            : `Ouvir a frase em inglês: ${text}`
+            ? "Parar a leitura em inglês"
+            : (label ?? `Ouvir a frase em inglês: ${text}`)
         }
         className={speaking ? "brightness-110" : ""}
         style={{ left: 0, bottom: 0 }}

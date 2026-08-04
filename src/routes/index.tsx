@@ -5,21 +5,23 @@ import { ALL_ASSETS } from "@/game/assets";
 import { GameProvider, useGame } from "@/game/state";
 import { Screen01Cover } from "@/game/screens/Screen01Cover";
 import { Screen02Case } from "@/game/screens/Screen02Case";
-import { Screen03FirstClue } from "@/game/screens/Screen03FirstClue";
-import { Screen04CompareGo } from "@/game/screens/Screen04CompareGo";
-import { Screen05Pattern } from "@/game/screens/Screen05Pattern";
-import { Screen06PracticeGo } from "@/game/screens/Screen06PracticeGo";
-import { Screen07Checkpoint } from "@/game/screens/Screen07Checkpoint";
-import { Screen08DiscoverGoes } from "@/game/screens/Screen08DiscoverGoes";
-import { Screen09PracticeGoes } from "@/game/screens/Screen09PracticeGoes";
-import { Screen10Sorting } from "@/game/screens/Screen10Sorting";
-import { Screen11MixedChallenge } from "@/game/screens/Screen11MixedChallenge";
-import { Screen12Summary } from "@/game/screens/Screen12Summary";
-import { Screen13Closing } from "@/game/screens/Screen13Closing";
+import { Screen03Poster } from "@/game/screens/Screen03Poster";
+import { Screen04Hypothesis } from "@/game/screens/Screen04Hypothesis";
+import { Screen05MeaningGo } from "@/game/screens/Screen05MeaningGo";
+import { Screen06TestHypothesis } from "@/game/screens/Screen06TestHypothesis";
+import { Screen07ConclusionGo } from "@/game/screens/Screen07ConclusionGo";
+import { Screen08PracticeGo } from "@/game/screens/Screen08PracticeGo";
+import { Screen09MeaningPlay } from "@/game/screens/Screen09MeaningPlay";
+import { Screen10NewInvestigation } from "@/game/screens/Screen10NewInvestigation";
+import { Screen11ComparePlay } from "@/game/screens/Screen11ComparePlay";
+import { Screen12Sorting } from "@/game/screens/Screen12Sorting";
+import { Screen13OtherSubjects } from "@/game/screens/Screen13OtherSubjects";
+import { Screen14Production } from "@/game/screens/Screen14Production";
+import { Screen15Closing } from "@/game/screens/Screen15Closing";
 
-const TITLE = "Wordville – Verb Detectives | Simple Present: go e goes";
+const TITLE = "Wordville – Verb Detectives | go, goes, play e plays";
 const DESCRIPTION =
-  "Objeto digital educacional infantil: ajude a detetive Lex a descobrir quando usar go e goes no simple present, com áudio, dicas e atividades interativas.";
+  "Investigação linguística infantil: observe, levante hipóteses e descubra com a detetive Lex quando usar go/goes e play/plays no simple present.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -38,17 +40,19 @@ export const Route = createFileRoute("/")({
 const SCREENS = [
   Screen01Cover,
   Screen02Case,
-  Screen03FirstClue,
-  Screen04CompareGo,
-  Screen05Pattern,
-  Screen06PracticeGo,
-  Screen07Checkpoint,
-  Screen08DiscoverGoes,
-  Screen09PracticeGoes,
-  Screen10Sorting,
-  Screen11MixedChallenge,
-  Screen12Summary,
-  Screen13Closing,
+  Screen03Poster,
+  Screen04Hypothesis,
+  Screen05MeaningGo,
+  Screen06TestHypothesis,
+  Screen07ConclusionGo,
+  Screen08PracticeGo,
+  Screen09MeaningPlay,
+  Screen10NewInvestigation,
+  Screen11ComparePlay,
+  Screen12Sorting,
+  Screen13OtherSubjects,
+  Screen14Production,
+  Screen15Closing,
 ];
 
 function ScreenRouter() {

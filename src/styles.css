@@ -4,6 +4,87 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme {
+  --color-wv-bg-light: #f4faff;
+  --color-wv-bg-blue: #e4f4ff;
+  --color-wv-sky: #52b7e8;
+  --color-wv-teal: #24566b;
+  --color-wv-coral: #ff786a;
+  --color-wv-mint: #58cdb5;
+  --color-wv-lavender: #a995e8;
+  --color-wv-yellow: #ffd76a;
+  --color-wv-text: #183b4a;
+
+  --font-display: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Nunito", system-ui, sans-serif;
+}
+
+@keyframes wv-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes wv-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes wv-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes wv-bounce {
+  0% {
+    transform: scale(0.94);
+  }
+  55% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes wv-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+@keyframes wv-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0 rgba(255, 215, 106, 0));
+  }
+  50% {
+    filter: drop-shadow(0 0 10px rgba(255, 215, 106, 0.85));
+  }
+}
+
+
 /*
  * Design system definition.
  *
@@ -140,5 +221,16 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+  }
+}
+
+@layer base {
+  body {
+    font-family: var(--font-body);
+    color: var(--color-wv-text);
+  }
+
+  .font-display {
+    font-family: var(--font-display);
   }
 }

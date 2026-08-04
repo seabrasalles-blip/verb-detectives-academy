@@ -77,7 +77,7 @@ export function Screen11ComparePlay() {
             labels={showRole}
             size="md"
             {...(finished ? {} : { onClick: () => tap(t) })}
-            ariaLabel={`Palavra ${t.suffix && finished ? t.word + t.suffix : t.word}`}
+            ariaLabel={`Palavra ${t.suffix ? t.word + t.suffix : t.word}`}
           />
         );
       })}

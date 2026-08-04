@@ -12,6 +12,10 @@ import btnBack from "@/assets/btn-back.png.asset.json";
 import btnAudio from "@/assets/btn-audio.png.asset.json";
 import btnHint from "@/assets/btn-hint.png.asset.json";
 import btnRestart from "@/assets/btn-restart.png.asset.json";
+import sceneGoSchool from "@/assets/scene-go-school.png";
+import scenePlaySoccer from "@/assets/scene-play-soccer.png";
+import sceneGirlSoccer from "@/assets/scene-girl-soccer.png";
+import sceneTwoKidsSchool from "@/assets/scene-two-kids-school.png";
 
 export const BG = {
   cover: bgCover.url,
@@ -44,10 +48,19 @@ export const BTN = {
   restart: btnRestart.url,
 } as const;
 
+/** Cenas de significado (ilustrações de apoio, não substituem nenhum asset original). */
+export const SCENE = {
+  goSchool: sceneGoSchool,
+  playSoccer: scenePlaySoccer,
+  girlSoccer: sceneGirlSoccer,
+  twoKidsSchool: sceneTwoKidsSchool,
+} as const;
+
 export const ALL_ASSETS: string[] = [
   ...Object.values(BG),
   ...Object.values(LEX),
   ...Object.values(BTN),
+  ...Object.values(SCENE),
 ];
 
 export type LexPose = keyof typeof LEX;

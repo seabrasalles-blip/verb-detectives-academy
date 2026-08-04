@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { AudioButton } from "@/components/game/AudioButton";
 import { CharacterLayer } from "@/components/game/CharacterLayer";
 import { FeedbackModal, useFeedback } from "@/components/game/FeedbackModal";
@@ -8,10 +7,10 @@ import { ProgressMarker } from "@/components/game/ProgressMarker";
 import { ScreenFrame } from "@/components/game/ScreenFrame";
 import { WordOption } from "@/components/game/WordOption";
 import { BG, type LexPose } from "@/game/assets";
-import { useGame } from "@/game/state";
+import { useGame, usePersistentState } from "@/game/state";
 
 export type Round = {
-  /** Frase com ___ no lugar do verbo. */
+  /** Sujeito da frase (antes da lacuna). */
   before: string;
   after: string;
   options: [string, string];
@@ -22,6 +21,7 @@ export type Round = {
 
 type Props = {
   screenNumber: number;
+  storageKey: string;
   title: string;
   rounds: Round[];
   hint: string;
@@ -29,9 +29,13 @@ type Props = {
   pose?: LexPose;
 };
 
-/** Prática por rodadas: uma frase por vez, sem alternativa pré-selecionada. */
+/**
+ * Prática por rodadas: uma frase por vez, nenhuma alternativa pré-selecionada,
+ * áudio somente depois do acerto e progresso preservado ao recarregar.
+ */
 export function RoundPractice({
   screenNumber,
+  storageKey,
   title,
   rounds,
   hint,
@@ -40,27 +44,30 @@ export function RoundPractice({
 }: Props) {
   const { complete, isDone, attempts, registerMiss, resetAttempts } = useGame();
   const done = isDone(screenNumber);
-  const [index, setIndex] = useState(done ? rounds.length - 1 : 0);
-  const [wrongOption, setWrongOption] = useState<string | null>(null);
-  const [revealed, setRevealed] = useState(done);
+  const [index, setIndex] = usePersistentState<number>(`${storageKey}.index`, 0);
+  const [revealed, setRevealed] = usePersistentState<boolean>(`${storageKey}.revealed`, false);
+  const [wrongOption, setWrongOption] = usePersistentState<string | null>(
+    `${storageKey}.wrong`,
+    null,
+  );
   const fb = useFeedback();
 
-  const round = rounds[index]!;
-  const spoken = revealed
-    ? `${round.before} ${round.answer} ${round.after}`
-    : `${round.before} ${round.after}`;
+  const safeIndex = Math.min(index, rounds.length - 1);
+  const round = rounds[safeIndex]!;
+  const showAnswer = done || revealed;
+  const fullSentence = `${round.before} ${round.answer} ${round.after}`;
 
   const pick = (option: string) => {
-    if (revealed) return;
+    if (showAnswer) return;
     if (option === round.answer) {
       setWrongOption(null);
       setRevealed(true);
       fb.correct(round.success, () => {
-        if (index === rounds.length - 1) {
+        if (safeIndex === rounds.length - 1) {
           complete(screenNumber);
           return;
         }
-        setIndex((i) => i + 1);
+        setIndex(safeIndex + 1);
         setRevealed(false);
         resetAttempts();
       });
@@ -71,21 +78,24 @@ export function RoundPractice({
     }
   };
 
-  const lastDone = revealed && index === rounds.length - 1;
+  const lastDone = showAnswer && safeIndex === rounds.length - 1;
 
   return (
     <ScreenFrame background={BG.activity} nextEnabled={done || lastDone}>
-      <CharacterLayer pose={pose} height={320} left={12} bottom={96} />
+      <CharacterLayer pose={pose} height={300} left={8} bottom={110} />
 
-      <Panel style={{ left: 452, top: 58, width: 512, height: 286 }}>
+      <Panel style={{ left: 452, top: 54, width: 512, height: 268 }}>
         <div className="flex h-full flex-col items-center justify-center gap-5 px-6 text-center">
-          <h2 className="font-display text-[30px] leading-none font-extrabold tracking-wide text-[#24566B] uppercase">
+          <h2 className="font-display text-[26px] leading-none font-extrabold tracking-wide text-[#24566B] uppercase">
             {title}
           </h2>
-          <p className="font-display text-[42px] leading-tight font-extrabold text-[#183B4A]">
-            {round.before}{" "}
-            {revealed ? (
-              <span className="text-[#2C9C86] underline decoration-[#58CDB5] decoration-4 underline-offset-8">
+          <p
+            lang="en"
+            className="font-display text-[40px] leading-tight font-extrabold text-[#183B4A]"
+          >
+            <span className="text-[#463089]">{round.before}</span>{" "}
+            {showAnswer ? (
+              <span className="text-[#B93B2B] underline decoration-[#FF786A] decoration-4 underline-offset-8">
                 {round.answer}
               </span>
             ) : (
@@ -96,16 +106,16 @@ export function RoundPractice({
         </div>
       </Panel>
 
-      <ProgressMarker current={index + 1} total={rounds.length} left={452} top={356} />
+      <ProgressMarker current={safeIndex + 1} total={rounds.length} left={452} top={332} />
 
       <div className="absolute bottom-[130px] left-[380px] flex w-[760px] justify-center gap-9">
         {round.options.map((option) => (
           <WordOption
             key={option}
             size="lg"
-            disabled={revealed}
+            disabled={showAnswer}
             state={
-              revealed && option === round.answer
+              showAnswer && option === round.answer
                 ? "correct"
                 : wrongOption === option
                   ? "wrong"
@@ -114,12 +124,21 @@ export function RoundPractice({
             onClick={() => pick(option)}
             ariaLabel={`Escolher ${option}`}
           >
-            {option.toUpperCase()}
+            <span lang="en">{option.toUpperCase()}</span>
           </WordOption>
         ))}
       </div>
 
-      <AudioButton text={spoken} left={200} />
+      <AudioButton
+        text={fullSentence}
+        left={200}
+        disabled={!showAnswer}
+        label={
+          showAnswer
+            ? `Ouvir a frase completa: ${fullSentence}`
+            : "O áudio da frase completa fica disponível depois da resposta correta"
+        }
+      />
       <HintButton hint={hint} strongHint={strongHint} attempts={attempts} left={370} />
 
       <FeedbackModal feedback={fb.feedback} onClose={fb.close} />

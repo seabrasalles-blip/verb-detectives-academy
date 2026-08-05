@@ -34,8 +34,14 @@ export function AudioButton({
   style,
 }: Props) {
   const [speaking, setSpeaking] = useState(false);
+  const [supported, setSupported] = useState(true);
   const finalWidth = width ?? (compact ? 112 : 158);
   const finalBottom = top === undefined && bottom === undefined ? 24 : bottom;
+  // Frases incorretas nunca podem ser pronunciadas.
+  const speakable = canSpeak(text);
+  const isDisabled = disabled || !speakable || !supported;
+
+  useEffect(() => setSupported(isSpeechSupported()), []);
 
   useEffect(() => {
     setSpeaking(false);
@@ -50,13 +56,20 @@ export function AudioButton({
       <AssetButton
         src={BTN.audio}
         width={finalWidth}
-        disabled={disabled}
+        disabled={isDisabled}
         label={
-          speaking ? "Parar a leitura em inglês" : (label ?? `Ouvir a frase em inglês: ${text}`)
+          !supported
+            ? "A leitura em voz alta não está disponível neste navegador"
+            : !speakable
+              ? "Esta frase ainda não pode ser ouvida"
+              : speaking
+                ? "Parar a leitura em inglês"
+                : (label ?? `Ouvir a frase em inglês: ${text}`)
         }
         className={speaking ? "brightness-110" : ""}
         style={top !== undefined ? { left: 0, top: 0 } : { left: 0, bottom: 0 }}
         onClick={() => {
+          if (isDisabled) return;
           if (speaking) {
             stopSpeaking();
             setSpeaking(false);
@@ -68,6 +81,7 @@ export function AudioButton({
           speakEnglish(text, () => setSpeaking(false));
         }}
       />
+
       {speaking && (
         <span
           aria-hidden="true"

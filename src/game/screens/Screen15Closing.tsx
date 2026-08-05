@@ -12,18 +12,14 @@ export function Screen15Closing() {
     <ScreenFrame background={BG.final} showNext={false}>
       <CharacterLayer pose="celebrating" height={330} right={20} bottom={16} />
 
-      <div className="absolute top-[22px] left-[70px] w-[640px] text-center">
-        <p className="font-display text-[24px] leading-none font-extrabold tracking-[0.16em] text-[#FFD76A] uppercase">
-          Caso resolvido!
-        </p>
+      <div className="absolute top-[36px] left-[70px] w-[640px] text-center">
         <h2
-          className="font-display mt-2 text-[44px] leading-none font-extrabold text-[#FFFDF6]"
+          className="font-display text-[46px] leading-none font-extrabold text-[#FFFDF6]"
           style={{ textShadow: "0 4px 0 #24566B" }}
         >
           Você virou um Verb Detective!
         </h2>
       </div>
-
 
       <Panel style={{ left: 70, top: 108, width: 300, height: 150 }}>
         <div className="flex h-full flex-col items-center justify-center gap-1 text-center">

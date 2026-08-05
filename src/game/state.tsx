@@ -10,14 +10,10 @@ import {
 } from "react";
 import { stopSpeaking } from "./speech";
 
-const STORAGE_KEY = "wordville-verb-detectives:v3";
-/** Versões antigas do estado salvo são descartadas com segurança. */
-const STATE_VERSION = 3;
-const LEGACY_KEYS = ["wordville-verb-detectives", "wordville-verb-detectives:v2"];
+const STORAGE_KEY = "wordville-verb-detectives:v2";
 export const TOTAL_SCREENS = 15;
 
 type Saved = {
-  version: number;
   screen: number;
   completed: number[];
   attempts: Record<number, number>;
@@ -53,11 +49,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
   // localStorage só existe no cliente; hidratamos depois da montagem.
   useEffect(() => {
     try {
-      LEGACY_KEYS.forEach((k) => window.localStorage.removeItem(k));
       const raw = window.localStorage.getItem(STORAGE_KEY);
-      const parsed = raw ? (JSON.parse(raw) as Partial<Saved>) : null;
-      if (parsed && parsed.version === STATE_VERSION) {
-        if (typeof parsed.screen === "number" && Number.isFinite(parsed.screen)) {
+      if (raw) {
+        const parsed = JSON.parse(raw) as Partial<Saved>;
+        if (typeof parsed.screen === "number") {
           setScreen(Math.min(Math.max(parsed.screen, 1), TOTAL_SCREENS));
         }
         if (Array.isArray(parsed.completed)) setCompleted(parsed.completed);
@@ -65,9 +60,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
           setAttemptsByScreen(parsed.attempts);
         }
         if (parsed.data && typeof parsed.data === "object") setDataState(parsed.data);
-      } else if (raw) {
-        // Estado incompatível: recomeça do zero, sem tela em branco.
-        window.localStorage.removeItem(STORAGE_KEY);
       }
     } catch {
       /* progresso corrompido: recomeça do zero */
@@ -82,7 +74,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
       window.localStorage.setItem(
         STORAGE_KEY,
         JSON.stringify({
-          version: STATE_VERSION,
           screen,
           completed,
           attempts: attemptsByScreen,

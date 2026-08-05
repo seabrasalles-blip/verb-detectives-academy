@@ -85,6 +85,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Wordville – Verb Detectives" },
+      { name: "twitter:description", content: "Jogo educativo de inglês para crianças sobre o simple present." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a2f230a1-8195-49e2-b781-495c387ff4f8/id-preview-f987c6fd--bfad318d-5dee-4a72-9994-e6e3dd5b4f9c.lovable.app-1785877900338.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a2f230a1-8195-49e2-b781-495c387ff4f8/id-preview-f987c6fd--bfad318d-5dee-4a72-9994-e6e3dd5b4f9c.lovable.app-1785877900338.png" },
     ],
     links: [
       {

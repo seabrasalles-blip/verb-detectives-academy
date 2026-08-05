@@ -68,7 +68,10 @@ export function Screen07ConclusionGo() {
                 lang="en"
                 className="font-display text-[46px] leading-none font-extrabold text-[#B93B2B]"
               >
-                GO<span className="rounded bg-[#FFD76A] px-1 text-[#7A4E00]">ES</span>
+                GO
+                <span className="inline-block rounded bg-[#FFD76A] px-1 leading-none text-[#7A4E00]">
+                  ES
+                </span>
               </p>
             </div>
           </Panel>
@@ -114,6 +117,7 @@ export function Screen07ConclusionGo() {
               size="sm"
               labels
               compactLabels
+              showQuestion={false}
               fixedColumns
               columnGap={GAP}
               tokens={[
@@ -136,6 +140,7 @@ export function Screen07ConclusionGo() {
               size="sm"
               labels
               compactLabels
+              showQuestion={false}
               fixedColumns
               columnGap={GAP}
               tokens={[

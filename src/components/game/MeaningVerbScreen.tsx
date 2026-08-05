@@ -91,7 +91,7 @@ export function MeaningVerbScreen({
         />
       </div>
 
-      <div className="absolute" style={{ left: 440, top: 108, width: 620 }}>
+      <div className="absolute" style={{ left: 440, top: phase === 0 ? 190 : 108, width: 620 }}>
         {phase >= 1 && (
           <p
             className="font-display text-[58px] leading-none font-extrabold text-[#FF786A] motion-safe:animate-[wv-rise_400ms_ease-out]"

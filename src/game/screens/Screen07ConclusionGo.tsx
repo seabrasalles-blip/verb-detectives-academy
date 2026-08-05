@@ -140,6 +140,7 @@ export function Screen07ConclusionGo() {
               size="sm"
               labels
               compactLabels
+              showQuestion={false}
               fixedColumns
               columnGap={GAP}
               tokens={[

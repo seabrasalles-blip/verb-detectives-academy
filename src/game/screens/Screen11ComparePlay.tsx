@@ -34,7 +34,7 @@ export function Screen11ComparePlay() {
         </>
       }
       ruleExamples={[
-        { text: "They play soccer." },
+        { text: "They play soccer.", audio: true, audioLabel: "Ouvir: They play soccer." },
         { text: "She plays soccer.", audio: true, audioLabel: "Ouvir: She plays soccer." },
       ]}
     />

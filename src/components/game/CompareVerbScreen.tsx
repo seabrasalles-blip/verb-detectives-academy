@@ -183,7 +183,9 @@ export function CompareVerbScreen({
               >
                 {g.verb}
                 {g.suffix && (
-                  <span className="rounded bg-[#FFD76A] px-1 text-[#7A4E00]">{g.suffix}</span>
+                  <span className="inline-block rounded bg-[#FFD76A] px-1 leading-none text-[#7A4E00]">
+                    {g.suffix}
+                  </span>
                 )}
               </p>
             </div>

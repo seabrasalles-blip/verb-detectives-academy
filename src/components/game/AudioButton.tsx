@@ -1,7 +1,7 @@
 import { useEffect, useState, type CSSProperties } from "react";
 import { AssetButton } from "./AssetButton";
 import { BTN } from "@/game/assets";
-import { speakEnglish, stopSpeaking } from "@/game/speech";
+import { canSpeak, isSpeechSupported, speakEnglish, stopSpeaking } from "@/game/speech";
 
 type Props = {
   /** Sempre uma frase completa e correta em inglês. */

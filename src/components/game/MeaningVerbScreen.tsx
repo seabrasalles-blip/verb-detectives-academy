@@ -123,10 +123,10 @@ export function MeaningVerbScreen({
         >
           <div className="w-full rounded-[24px] border-4 border-[#52B7E8] bg-[#F4FAFF]/95 px-4 py-3 shadow-[0_4px_0_rgba(36,86,107,0.10)]">
             <SentenceRow tokens={tokens} labels fixedColumns compactLabels size="sm" />
+            <p className="mt-2 border-t-2 border-[#BFE3F7] pt-2 text-center text-[21px] leading-snug font-bold text-[#183B4A]">
+              {synthesis}
+            </p>
           </div>
-          <p className="w-full text-center text-[22px] leading-snug font-bold text-[#183B4A]">
-            {synthesis}
-          </p>
         </div>
       )}
 

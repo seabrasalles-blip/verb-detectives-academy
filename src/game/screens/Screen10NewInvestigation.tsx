@@ -1,4 +1,3 @@
-import { AudioButton } from "@/components/game/AudioButton";
 import { CharacterLayer } from "@/components/game/CharacterLayer";
 import { DialogueBubble } from "@/components/game/DialogueBubble";
 import { FeedbackModal, useFeedback } from "@/components/game/FeedbackModal";
@@ -97,12 +96,6 @@ export function Screen10NewInvestigation() {
           Vou investigar
         </button>
       )}
-
-      <AudioButton
-        text="She play soccer."
-        left={196}
-        label="Ouvir a frase encontrada no cartaz."
-      />
 
       <FeedbackModal feedback={fb.feedback} onClose={fb.close} />
     </ScreenFrame>

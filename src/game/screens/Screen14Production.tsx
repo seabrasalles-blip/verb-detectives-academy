@@ -14,7 +14,10 @@ type Task = {
   answer: string[];
   roles: Role[];
   success: string;
+  /** Primeiro erro: convida a observar. */
   errors: Record<string, string>;
+  /** Erros seguintes: explica com a substituição pronominal. */
+  strongErrors: Record<string, string>;
 };
 
 const TASKS: Task[] = [
@@ -26,9 +29,14 @@ const TASKS: Task[] = [
     roles: ["subject", "verb", "complement"],
     success: "Frase montada! She plays soccer.",
     errors: {
-      subject: "Na imagem há uma menina só. Qual sujeito combina com ela?",
-      verb: "Com she, o verbo play recebe s.",
-      complement: "Falta dizer o que ela joga.",
+      subject: "Observe a imagem: quem realiza a ação? Escolha o pronome que fala dela.",
+      verb: "Observe o sujeito da frase e lembre do grupo dele.",
+      complement: "Observe a imagem: falta dizer o que ela joga.",
+    },
+    strongErrors: {
+      subject: "Na imagem há uma menina: o pronome é she.",
+      verb: "She está no grupo de he, she e it, então play vira plays.",
+      complement: "O complemento desta cena é soccer.",
     },
   },
   {
@@ -39,9 +47,14 @@ const TASKS: Task[] = [
     roles: ["subject", "verb", "complement"],
     success: "Frase montada! They go to school.",
     errors: {
-      subject: "Na imagem há duas crianças. Qual sujeito combina com elas?",
-      verb: "Com they, o verbo fica na forma básica.",
-      complement: "Falta dizer para onde as crianças vão.",
+      subject: "Observe a imagem: quem realiza a ação? Escolha o pronome que fala das crianças.",
+      verb: "Observe o sujeito da frase e lembre do grupo dele.",
+      complement: "Observe a imagem: falta dizer para onde as crianças vão.",
+    },
+    strongErrors: {
+      subject: "Na imagem há duas crianças: o pronome é they.",
+      verb: "They está no grupo de I, you, we e they, então o verbo continua go.",
+      complement: "O complemento desta cena é to school.",
     },
   },
 ];
@@ -53,7 +66,7 @@ const SLOT_LABEL: Record<Role, string> = {
 };
 
 export function Screen14Production() {
-  const { complete, isDone, registerMiss } = useGame();
+  const { complete, isDone, attempts, registerMiss, resetAttempts } = useGame();
   const done = isDone(14);
   const [taskIndex, setTaskIndex] = usePersistentState<number>("s14.task", 0);
   const [slots, setSlots] = usePersistentState<(string | null)[]>("s14.slots", [null, null, null]);
@@ -88,7 +101,7 @@ export function Screen14Production() {
     const wrongAt = slots.findIndex((s, i) => s !== task.answer[i]);
     if (wrongAt === -1) {
       setSolved(true);
-      fb.correct(task.success, () => {
+      const onDone = () => {
         if (index === TASKS.length - 1) {
           complete(14);
           return;
@@ -96,10 +109,18 @@ export function Screen14Production() {
         setTaskIndex(index + 1);
         setSlots([null, null, null]);
         setSolved(false);
-      });
+        resetAttempts();
+      };
+      if (index === TASKS.length - 1) {
+        fb.stage("Etapa concluída! Você já monta frases completas em inglês.", onDone);
+      } else {
+        fb.correct(task.success, onDone);
+      }
     } else {
       registerMiss();
-      fb.wrong(task.errors[task.roles[wrongAt] as Role] ?? "Revise a ordem das palavras.");
+      const role = task.roles[wrongAt] as Role;
+      const source = attempts >= 1 ? task.strongErrors : task.errors;
+      fb.wrong(source[role] ?? "Observe cada parte da frase mais uma vez.");
     }
   };
 

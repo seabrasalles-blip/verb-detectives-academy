@@ -13,10 +13,13 @@ export type Round = {
   /** Sujeito da frase (antes da lacuna). */
   before: string;
   after: string;
+  /** Referente em português exibido antes da frase (obrigatório quando o sujeito é "It"). */
+  referent?: string;
   options: [string, string];
   answer: string;
   success: string;
-  error: string;
+  /** [primeiro erro, segundo erro em diante] — o primeiro nunca entrega a resposta. */
+  hints: [string, string];
 };
 
 type Props = {
@@ -27,11 +30,13 @@ type Props = {
   hint: string;
   strongHint: string;
   pose?: LexPose;
+  /** Mensagem do fim da etapa (todas as rodadas concluídas). */
+  stageMessage?: string;
 };
 
 /**
  * Prática por rodadas: uma frase por vez, nenhuma alternativa pré-selecionada,
- * áudio somente depois do acerto e progresso preservado ao recarregar.
+ * feedback progressivo, áudio somente depois do acerto e progresso preservado.
  */
 export function RoundPractice({
   screenNumber,
@@ -41,54 +46,64 @@ export function RoundPractice({
   hint,
   strongHint,
   pose = "pointing",
+  stageMessage = "Etapa concluída! Você usou o pronome para escolher a forma do verbo.",
 }: Props) {
   const { complete, isDone, attempts, registerMiss, resetAttempts } = useGame();
   const done = isDone(screenNumber);
   const [index, setIndex] = usePersistentState<number>(`${storageKey}.index`, 0);
   const [revealed, setRevealed] = usePersistentState<boolean>(`${storageKey}.revealed`, false);
+  const [misses, setMisses] = usePersistentState<number>(`${storageKey}.misses`, 0);
   const [wrongOption, setWrongOption] = usePersistentState<string | null>(
     `${storageKey}.wrong`,
     null,
   );
   const fb = useFeedback();
 
-  const safeIndex = Math.min(index, rounds.length - 1);
+  const safeIndex = Math.min(Math.max(index, 0), rounds.length - 1);
   const round = rounds[safeIndex]!;
   const showAnswer = done || revealed;
   const fullSentence = `${round.before} ${round.answer} ${round.after}`;
+  const isLast = safeIndex === rounds.length - 1;
 
   const pick = (option: string) => {
-    if (showAnswer) return;
+    if (showAnswer || fb.feedback) return;
     if (option === round.answer) {
       setWrongOption(null);
       setRevealed(true);
-      fb.correct(round.success, () => {
-        if (safeIndex === rounds.length - 1) {
+      const onDone = () => {
+        if (isLast) {
           complete(screenNumber);
           return;
         }
         setIndex(safeIndex + 1);
         setRevealed(false);
+        setMisses(0);
+        setWrongOption(null);
         resetAttempts();
-      });
+      };
+      if (isLast) fb.stage(stageMessage, onDone);
+      else fb.correct(round.success, onDone);
     } else {
       registerMiss();
+      setMisses(misses + 1);
+      // Permite corrigir a escolha: nada é bloqueado.
       setWrongOption(option);
-      fb.wrong(round.error);
+      fb.wrong(misses === 0 ? round.hints[0] : round.hints[1]);
     }
   };
 
-  const lastDone = showAnswer && safeIndex === rounds.length - 1;
-
   return (
-    <ScreenFrame background={BG.activity} nextEnabled={done || lastDone}>
+    <ScreenFrame background={BG.activity} nextEnabled={done || (showAnswer && isLast)}>
       <CharacterLayer pose={pose} height={300} left={8} bottom={110} />
 
-      <Panel style={{ left: 452, top: 54, width: 512, height: 268 }}>
-        <div className="flex h-full flex-col items-center justify-center gap-5 px-6 text-center">
+      <Panel style={{ left: 452, top: 46, width: 512, height: 286 }}>
+        <div className="flex h-full flex-col items-center justify-center gap-4 px-6 text-center">
           <h2 className="font-display text-[26px] leading-none font-extrabold tracking-wide text-[#24566B] uppercase">
             {title}
           </h2>
+          {round.referent && (
+            <p className="text-[20px] leading-snug font-bold text-[#24566B]">{round.referent}</p>
+          )}
           <p
             lang="en"
             className="font-display text-[40px] leading-tight font-extrabold text-[#183B4A]"
@@ -106,7 +121,7 @@ export function RoundPractice({
         </div>
       </Panel>
 
-      <ProgressMarker current={safeIndex + 1} total={rounds.length} left={452} top={332} />
+      <ProgressMarker current={safeIndex + 1} total={rounds.length} left={452} top={340} />
 
       <div className="absolute bottom-[130px] left-[380px] flex w-[760px] justify-center gap-9">
         {round.options.map((option) => (
@@ -130,7 +145,7 @@ export function RoundPractice({
       </div>
 
       <AudioButton
-        text={fullSentence}
+        text={showAnswer ? fullSentence : ""}
         left={200}
         disabled={!showAnswer}
         label={

@@ -1,76 +1,94 @@
 import { CharacterLayer } from "@/components/game/CharacterLayer";
 import { FeedbackModal, useFeedback } from "@/components/game/FeedbackModal";
+import { HintButton } from "@/components/game/HintButton";
 import { Instruction } from "@/components/game/Instruction";
 import { Note } from "@/components/game/Note";
 import { ScreenFrame } from "@/components/game/ScreenFrame";
-import { PartCard, SuspectPoster } from "@/components/game/Sentence";
+import { SentenceRow, SuspectPoster } from "@/components/game/Sentence";
+import { WordOption } from "@/components/game/WordOption";
 import { BG } from "@/game/assets";
 import { useGame, usePersistentState } from "@/game/state";
 
-const WORDS = ["He", "go", "to", "school."] as const;
+/** Levantamento de hipótese: o aluno escolhe a explicação mais provável. */
+const OPTIONS = [
+  { id: "verb", text: "O verbo muda por causa do sujeito.", correct: true },
+  { id: "order", text: "As palavras estão fora de ordem.", correct: false },
+  { id: "complement", text: "Falta uma palavra no complemento.", correct: false },
+];
 
 export function Screen04Hypothesis() {
-  const { complete, isDone } = useGame();
-  const [found, setFound] = usePersistentState<string[]>("s4.found", []);
-  const fb = useFeedback();
+  const { complete, isDone, attempts, registerMiss } = useGame();
   const done = isDone(4);
+  const [chosen, setChosen] = usePersistentState<string | null>("s4.choice", null);
+  const fb = useFeedback();
+  const solved = done || chosen === "verb";
 
-  const tap = (word: string) => {
-    if (word === "go") {
-      if (!found.includes("go")) setFound([...found, "go"]);
-      fb.clue("Boa pista! Você escolheu a palavra que mostra a ação.", () =>
-        fb.hypothesis(
-          "Talvez o verbo mude por causa do sujeito. Vamos testar essa hipótese.",
-          () => complete(4),
-        ),
+  const pick = (opt: (typeof OPTIONS)[number]) => {
+    if (solved || fb.feedback) return;
+    if (opt.correct) {
+      setChosen(opt.id);
+      fb.hypothesis(
+        "Boa hipótese! Vamos investigar o verbo go para descobrir como ele muda depois de he.",
+        () => complete(4),
       );
       return;
     }
-    if (word === "He") {
-      if (!found.includes("He")) setFound([...found, "He"]);
-      fb.clue(
-        "Você encontrou quem realiza a ação. He é o sujeito. Agora procure a palavra que mostra a ação.",
-      );
-      return;
-    }
-    fb.clue("Essa palavra completa a ideia. Procure a palavra que mostra a ação.");
-  };
-
-  const roleOf = (word: string) => {
-    if (word === "He" && found.includes("He")) return "subject" as const;
-    if (word === "go" && (found.includes("go") || done)) return "verb" as const;
-    return undefined;
+    registerMiss();
+    fb.wrong(
+      attempts >= 1
+        ? "A ordem e o complemento estão certos: He … to school. Sobra observar a palavra da ação."
+        : "Leia a frase de novo e compare cada parte. Qual delas parece não combinar com he?",
+    );
   };
 
   return (
-    <ScreenFrame background={BG.investigation} nextEnabled={done}>
-      <CharacterLayer pose="pointing" height={250} left={4} bottom={40} />
+    <ScreenFrame background={BG.investigation} nextEnabled={solved}>
+      <CharacterLayer pose="pointing" height={250} left={4} bottom={48} />
 
-      <Instruction top={22} width={640}>
-        Toque na palavra que você gostaria de investigar.
+      <Instruction top={18} width={760}>
+        {solved
+          ? "Anotamos a hipótese na ficha da investigação."
+          : "Qual hipótese explica melhor o que está estranho na frase?"}
       </Instruction>
 
-      <SuspectPoster style={{ left: 300, top: 108, width: 640 }}>
-        <div className="flex flex-wrap items-start justify-center gap-3">
-          {WORDS.map((w) => (
-            <PartCard
-              key={w}
-              word={w}
-              role={roleOf(w)}
-              labels={!!roleOf(w)}
-              size="md"
-              onClick={() => tap(w)}
-              ariaLabel={`Investigar a palavra ${w}`}
-            />
-          ))}
-        </div>
+      <SuspectPoster style={{ left: 320, top: 100, width: 620 }}>
+        <SentenceRow
+          size="sm"
+          labels
+          compactLabels
+          tokens={[
+            { word: "He", role: "subject" },
+            { word: "go", role: "verb" },
+            { word: "to school", role: "complement", question: "para onde?" },
+          ]}
+        />
       </SuspectPoster>
 
-      {(found.includes("go") || done) && (
-        <Note kind="hypothesis" style={{ left: 300, top: 320, width: 640 }}>
-          O verbo pode mudar por causa do sujeito.
+      {solved ? (
+        <Note kind="hypothesis" style={{ left: 320, top: 300, width: 620 }}>
+          O verbo pode mudar por causa do sujeito. Vamos testar essa hipótese.
         </Note>
+      ) : (
+        <div className="absolute top-[290px] left-[300px] flex w-[660px] flex-col items-center gap-3">
+          {OPTIONS.map((opt) => (
+            <WordOption
+              key={opt.id}
+              size="sm"
+              onClick={() => pick(opt)}
+              ariaLabel={`Escolher a hipótese: ${opt.text}`}
+            >
+              <span className="px-2 text-[22px] leading-tight">{opt.text}</span>
+            </WordOption>
+          ))}
+        </div>
       )}
+
+      <HintButton
+        hint="Uma hipótese é um palpite que ainda vamos testar."
+        strongHint="Compare He go com outras frases que você já viu. A palavra da ação é a suspeita."
+        attempts={attempts}
+        left={210}
+      />
 
       <FeedbackModal feedback={fb.feedback} onClose={fb.close} />
     </ScreenFrame>

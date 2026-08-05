@@ -140,6 +140,7 @@ export function CompareVerbScreen({
             question={t.question}
             labels={showRole}
             compactLabels
+            showQuestion={!stepsDone}
             size="sm"
             width={W[t.role]}
             {...(clickable ? { onClick: () => tap(t) } : {})}

@@ -1,25 +1,41 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { AssetButton } from "./AssetButton";
 import { BTN } from "@/game/assets";
 import { speakEnglish, stopSpeaking } from "@/game/speech";
 
+type Props = {
+  /** Sempre uma frase completa e correta em inglês. */
+  text: string;
+  label?: string;
+  width?: number;
+  left?: number;
+  right?: number;
+  top?: number;
+  bottom?: number;
+  disabled?: boolean;
+  /** Variante compacta: fica ao lado da frase, não no rodapé. */
+  compact?: boolean;
+  className?: string;
+  style?: CSSProperties;
+};
+
 /** Lê em voz alta apenas frases completas e corretas em inglês. */
 export function AudioButton({
   text,
-  left,
-  bottom = 24,
-  width = 158,
   label,
+  width,
+  left,
+  right,
+  top,
+  bottom,
   disabled = false,
-}: {
-  text: string;
-  left: number;
-  bottom?: number;
-  width?: number;
-  label?: string;
-  disabled?: boolean;
-}) {
+  compact = false,
+  className = "",
+  style,
+}: Props) {
   const [speaking, setSpeaking] = useState(false);
+  const finalWidth = width ?? (compact ? 112 : 158);
+  const finalBottom = top === undefined && bottom === undefined ? 24 : bottom;
 
   useEffect(() => {
     setSpeaking(false);
@@ -27,24 +43,27 @@ export function AudioButton({
   }, [text]);
 
   return (
-    <div className="absolute" style={{ left, bottom, width }}>
+    <div
+      className={`absolute ${className}`}
+      style={{ left, right, top, bottom: finalBottom, width: finalWidth, ...style }}
+    >
       <AssetButton
         src={BTN.audio}
-        width={width}
+        width={finalWidth}
         disabled={disabled}
         label={
-          speaking
-            ? "Parar a leitura em inglês"
-            : (label ?? `Ouvir a frase em inglês: ${text}`)
+          speaking ? "Parar a leitura em inglês" : (label ?? `Ouvir a frase em inglês: ${text}`)
         }
         className={speaking ? "brightness-110" : ""}
-        style={{ left: 0, bottom: 0 }}
+        style={top !== undefined ? { left: 0, top: 0 } : { left: 0, bottom: 0 }}
         onClick={() => {
           if (speaking) {
             stopSpeaking();
             setSpeaking(false);
             return;
           }
+          // Interrompe qualquer fala anterior antes de iniciar esta.
+          stopSpeaking();
           setSpeaking(true);
           speakEnglish(text, () => setSpeaking(false));
         }}
@@ -57,4 +76,9 @@ export function AudioButton({
       )}
     </div>
   );
+}
+
+/** Atalho semântico para o áudio compacto colado à frase. */
+export function InlineAudioButton(props: Omit<Props, "compact">) {
+  return <AudioButton {...props} compact />;
 }

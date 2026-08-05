@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 export type Role = "subject" | "verb" | "complement";
 
@@ -26,8 +26,15 @@ export const ROLE_STYLE: Record<
     bg: "#E4F4FF",
     text: "#1B4557",
     label: "complemento",
-    question: "o quê? / para onde?",
+    question: "o quê?",
   },
+};
+
+/** Larguras fixas por função: garantem colunas alinhadas entre frases diferentes. */
+export const COLUMN_WIDTH: Record<Role, number> = {
+  subject: 120,
+  verb: 170,
+  complement: 250,
 };
 
 type PartProps = {
@@ -38,15 +45,28 @@ type PartProps = {
   role?: Role | undefined;
   /** Mostra os rótulos "quem? / sujeito" abaixo do card. */
   labels?: boolean;
+  /** Rótulos compactos (usados quando há duas frases na mesma tela). */
+  compactLabels?: boolean;
+  /** Mostra a pergunta orientadora (quem? / ação / para onde?). */
+  showQuestion?: boolean;
+  /** Mostra o nome da função (sujeito / verbo / complemento). */
+  showRole?: boolean;
+  /** Pergunta específica para este complemento (ex.: "para onde?"). */
+  question?: string | undefined;
+  /** Destaca o sufixo em amarelo. Quando false, a palavra fica visualmente inteira. */
+  suffixHighlight?: boolean;
+  /** Largura fixa do card (colunas alinhadas). */
+  width?: number | undefined;
   size?: "sm" | "md" | "lg" | undefined;
   onClick?: (() => void) | undefined;
   ariaLabel?: string | undefined;
   dim?: boolean;
   className?: string;
+  style?: CSSProperties | undefined;
 };
 
 const SIZES = {
-  sm: "text-[28px] px-4 py-1.5 rounded-[14px]",
+  sm: "text-[30px] px-4 py-1.5 rounded-[14px]",
   md: "text-[38px] px-6 py-2 rounded-[18px]",
   lg: "text-[46px] px-7 py-2.5 rounded-[20px]",
 } as const;
@@ -56,59 +76,141 @@ export function PartCard({
   suffix,
   role,
   labels = false,
+  compactLabels = false,
+  showQuestion = true,
+  showRole = true,
+  question,
+  suffixHighlight = true,
+  width,
   size = "md",
   onClick,
   ariaLabel,
   dim = false,
   className = "",
+  style,
 }: PartProps) {
-  const style = role ? ROLE_STYLE[role] : null;
+  const roleStyle = role ? ROLE_STYLE[role] : null;
   const Tag = onClick ? "button" : "span";
+  const showLabels = labels && !!roleStyle && (showQuestion || showRole);
 
   return (
-    <span className={`inline-flex flex-col items-center gap-1 ${className}`}>
+    <span
+      className={`inline-flex flex-col items-center ${compactLabels ? "gap-0.5" : "gap-1"} ${className}`}
+      style={{ width, ...style }}
+    >
       <Tag
         {...(onClick
           ? { type: "button" as const, onClick, "aria-label": ariaLabel ?? `Palavra ${word}` }
           : {})}
         lang="en"
-        className={`font-display inline-flex items-baseline border-4 leading-none font-extrabold shadow-[0_4px_0_rgba(36,86,107,0.14)] transition-all duration-200 outline-none focus-visible:ring-4 focus-visible:ring-[#FFD76A] ${
+        className={`font-display inline-flex w-full items-baseline justify-center border-4 leading-none font-extrabold shadow-[0_4px_0_rgba(36,86,107,0.14)] transition-all duration-200 outline-none focus-visible:ring-4 focus-visible:ring-[#FFD76A] ${
           SIZES[size]
         } ${onClick ? "cursor-pointer motion-safe:hover:-translate-y-[3px]" : ""} ${
           dim ? "opacity-55" : ""
         }`}
         style={{
-          borderColor: style?.border ?? "#24566B",
-          backgroundColor: style?.bg ?? "#FFFDF5",
-          color: style?.text ?? "#183B4A",
+          borderColor: roleStyle?.border ?? "#24566B",
+          backgroundColor: roleStyle?.bg ?? "#FFFDF5",
+          color: roleStyle?.text ?? "#183B4A",
         }}
       >
         {word}
-        {suffix && (
-          <span
-            className="rounded-[6px] px-1"
-            style={{ backgroundColor: "#FFD76A", color: "#7A4E00" }}
-          >
-            {suffix}
-          </span>
-        )}
+        {suffix &&
+          (suffixHighlight ? (
+            <span
+              className="rounded-[6px] px-1"
+              style={{ backgroundColor: "#FFD76A", color: "#7A4E00" }}
+            >
+              {suffix}
+            </span>
+          ) : (
+            <span>{suffix}</span>
+          ))}
       </Tag>
-      {labels && style && (
-        <span className="flex flex-col items-center leading-tight">
-          <span className="text-[16px] font-bold text-[#24566B]">{style.question}</span>
-          <span
-            className="text-[15px] font-extrabold tracking-[0.08em] uppercase"
-            style={{ color: style.border === "#24566B" ? "#1B4557" : style.text }}
-          >
-            {style.label}
-          </span>
+      {showLabels && roleStyle && (
+        <span className="flex flex-col items-center leading-[1.15]">
+          {showQuestion && (
+            <span
+              className={`font-bold text-[#24566B] ${compactLabels ? "text-[15px]" : "text-[16px]"}`}
+            >
+              {question ?? roleStyle.question}
+            </span>
+          )}
+          {showRole && (
+            <span
+              className={`font-extrabold tracking-[0.06em] uppercase ${
+                compactLabels ? "text-[14px]" : "text-[15px]"
+              }`}
+              style={{ color: roleStyle.border === "#24566B" ? "#1B4557" : roleStyle.text }}
+            >
+              {roleStyle.label}
+            </span>
+          )}
         </span>
       )}
     </span>
   );
 }
 
-export type Token = { word: string; suffix?: string; role?: Role };
+export type Token = {
+  word: string;
+  suffix?: string;
+  role?: Role;
+  question?: string;
+  suffixHighlight?: boolean;
+};
+
+type RowProps = {
+  tokens: Token[];
+  labels?: boolean;
+  compactLabels?: boolean;
+  showQuestion?: boolean;
+  showRole?: boolean;
+  /** Usa COLUMN_WIDTH para que frases diferentes fiquem alinhadas. */
+  fixedColumns?: boolean;
+  columnGap?: number;
+  size?: PartProps["size"];
+  className?: string;
+  style?: CSSProperties | undefined;
+};
+
+/** Uma frase em linha, com colunas previsíveis. */
+export function SentenceRow({
+  tokens,
+  labels = false,
+  compactLabels = false,
+  showQuestion = true,
+  showRole = true,
+  fixedColumns = false,
+  columnGap = 16,
+  size = "md",
+  className = "",
+  style,
+}: RowProps) {
+  return (
+    <div
+      className={`flex items-start justify-center ${className}`}
+      style={{ gap: columnGap, ...style }}
+    >
+      {tokens.map((t, i) => (
+        <PartCard
+          key={`${t.word}-${i}`}
+          word={t.word}
+          suffix={t.suffix}
+          role={t.role}
+          question={t.question}
+          suffixHighlight={t.suffixHighlight ?? true}
+          labels={labels && !!t.role}
+          compactLabels={compactLabels}
+          showQuestion={showQuestion}
+          showRole={showRole}
+          size={size}
+          width={fixedColumns && t.role ? COLUMN_WIDTH[t.role] : undefined}
+        />
+      ))}
+    </div>
+  );
+}
 
 /** Frase analisada: cards lado a lado, com ou sem rótulos. */
 export function AnalyzedSentence({
@@ -130,6 +232,7 @@ export function AnalyzedSentence({
           word={t.word}
           suffix={t.suffix}
           role={t.role}
+          question={t.question}
           labels={labels && !!t.role}
           size={size}
         />

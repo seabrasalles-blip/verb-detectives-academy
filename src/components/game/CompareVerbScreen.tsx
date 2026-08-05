@@ -160,7 +160,13 @@ export function CompareVerbScreen({
       )}
 
       <Instruction top={16} width={760}>
-        {rulePhase ? ruleTitle : stepsDone ? "O que mudou entre as duas frases?" : current.prompt}
+        {rulePhase
+          ? ruleTitle
+          : revealed
+            ? "Descobrimos o que mudou nas duas frases."
+            : stepsDone
+              ? "O que mudou entre as duas frases?"
+              : current.prompt}
       </Instruction>
 
       {rulePhase && ruleGroups ? (

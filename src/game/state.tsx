@@ -10,7 +10,8 @@ import {
 } from "react";
 import { stopSpeaking } from "./speech";
 
-const STORAGE_KEY = "wordville-verb-detectives:v2";
+const STORAGE_KEY = "wordville-verb-detectives:v3";
+const LEGACY_STORAGE_KEY = "wordville-verb-detectives:v2";
 export const TOTAL_SCREENS = 15;
 
 type Saved = {
@@ -18,6 +19,7 @@ type Saved = {
   completed: number[];
   attempts: Record<number, number>;
   data: Record<string, unknown>;
+  finished: boolean;
 };
 
 type GameContextValue = {
@@ -28,6 +30,9 @@ type GameContextValue = {
   back: () => void;
   goTo: (n: number) => void;
   restart: () => void;
+  /** Sessão concluída: o próximo carregamento começa do zero. */
+  finished: boolean;
+  finish: () => void;
   attempts: number;
   registerMiss: () => void;
   resetAttempts: () => void;
@@ -43,23 +48,31 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [completed, setCompleted] = useState<number[]>([]);
   const [attemptsByScreen, setAttemptsByScreen] = useState<Record<number, number>>({});
   const [data, setDataState] = useState<Record<string, unknown>>({});
+  const [finished, setFinished] = useState(false);
   const hydrated = useRef(false);
   const [, forceHydrated] = useState(0);
 
   // localStorage só existe no cliente; hidratamos depois da montagem.
   useEffect(() => {
     try {
+      // Progresso de versões anteriores nunca é restaurado.
+      window.localStorage.removeItem(LEGACY_STORAGE_KEY);
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<Saved>;
-        if (typeof parsed.screen === "number") {
-          setScreen(Math.min(Math.max(parsed.screen, 1), TOTAL_SCREENS));
+        if (parsed.finished === true) {
+          // Sessão já concluída: começa uma nova sessão vazia.
+          window.localStorage.removeItem(STORAGE_KEY);
+        } else {
+          if (typeof parsed.screen === "number") {
+            setScreen(Math.min(Math.max(parsed.screen, 1), TOTAL_SCREENS));
+          }
+          if (Array.isArray(parsed.completed)) setCompleted(parsed.completed);
+          if (parsed.attempts && typeof parsed.attempts === "object") {
+            setAttemptsByScreen(parsed.attempts);
+          }
+          if (parsed.data && typeof parsed.data === "object") setDataState(parsed.data);
         }
-        if (Array.isArray(parsed.completed)) setCompleted(parsed.completed);
-        if (parsed.attempts && typeof parsed.attempts === "object") {
-          setAttemptsByScreen(parsed.attempts);
-        }
-        if (parsed.data && typeof parsed.data === "object") setDataState(parsed.data);
       }
     } catch {
       /* progresso corrompido: recomeça do zero */
@@ -78,15 +91,22 @@ export function GameProvider({ children }: { children: ReactNode }) {
           completed,
           attempts: attemptsByScreen,
           data,
+          finished,
         } satisfies Saved),
       );
     } catch {
       /* armazenamento indisponível */
     }
-  }, [screen, completed, attemptsByScreen, data]);
+  }, [screen, completed, attemptsByScreen, data, finished]);
 
   const complete = useCallback((n: number) => {
     setCompleted((prev) => (prev.includes(n) ? prev : [...prev, n]));
+  }, []);
+
+  const finish = useCallback(() => {
+    stopSpeaking();
+    setFinished(true);
+    setCompleted((prev) => (prev.includes(TOTAL_SCREENS) ? prev : [...prev, TOTAL_SCREENS]));
   }, []);
 
   const goTo = useCallback((n: number) => {
@@ -106,14 +126,18 @@ export function GameProvider({ children }: { children: ReactNode }) {
       next: () => goTo(screen + 1),
       back: () => goTo(screen - 1),
       goTo,
+      finished,
+      finish,
       restart: () => {
         stopSpeaking();
         setCompleted([]);
         setAttemptsByScreen({});
         setDataState({});
+        setFinished(false);
         setScreen(1);
         try {
           window.localStorage.removeItem(STORAGE_KEY);
+          window.localStorage.removeItem(LEGACY_STORAGE_KEY);
         } catch {
           /* ignore */
         }
@@ -126,8 +150,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
         (Object.prototype.hasOwnProperty.call(data, key) ? (data[key] as T) : fallback),
       setData,
     }),
-    [screen, completed, complete, goTo, attemptsByScreen, data, setData],
+    [screen, completed, complete, goTo, attemptsByScreen, data, setData, finished, finish],
   );
+
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
 }

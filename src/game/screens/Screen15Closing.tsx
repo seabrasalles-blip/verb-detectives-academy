@@ -4,12 +4,19 @@ import { Panel } from "@/components/game/Panel";
 import { ScreenFrame } from "@/components/game/ScreenFrame";
 import { BG, BTN } from "@/game/assets";
 import { useGame } from "@/game/state";
+import { useEffect } from "react";
 
 export function Screen15Closing() {
-  const { restart } = useGame();
+  const { restart, finish } = useGame();
+
+  // Marca a sessão como concluída: a tela final continua visível,
+  // mas um recarregamento começa uma sessão nova.
+  useEffect(() => {
+    finish();
+  }, [finish]);
 
   return (
-    <ScreenFrame background={BG.final} showNext={false}>
+    <ScreenFrame background={BG.final} showBack={false} showNext={false}>
       <CharacterLayer pose="celebrating" height={330} right={20} bottom={16} />
 
       <div className="absolute top-[36px] left-[70px] w-[640px] text-center">

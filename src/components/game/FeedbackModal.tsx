@@ -219,6 +219,9 @@ export function FeedbackModal({
       className="absolute inset-0 z-50 flex items-end justify-center bg-[#183B4A]/25 pb-[70px] motion-safe:animate-[wv-fade_200ms_ease-out]"
       onPointerDown={(e) => e.stopPropagation()}
     >
+      <div className="sr-only" aria-live="assertive" role="status">
+        {`${tone.kicker}. ${feedback.message}`}
+      </div>
       <div
         ref={dialogRef}
         role={feedback.tone === "wrong" ? "alertdialog" : "dialog"}
@@ -267,15 +270,6 @@ export function FeedbackModal({
           {tone.action}
         </button>
       </div>
-    </div>
-  );
-}
-
-/** Região viva anunciada por leitores de tela, sempre montada. */
-export function FeedbackAnnouncer({ feedback }: { feedback: Feedback }) {
-  return (
-    <div className="sr-only" aria-live="assertive" role="status">
-      {feedback ? `${TONE[feedback.tone].kicker}. ${feedback.message}` : ""}
     </div>
   );
 }

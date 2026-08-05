@@ -10,8 +10,8 @@ import {
 } from "react";
 import { stopSpeaking } from "./speech";
 
-const STORAGE_KEY = "wordville-verb-detectives:v3";
-const LEGACY_STORAGE_KEY = "wordville-verb-detectives:v2";
+const STORAGE_KEY = "wordville-verb-detectives:v4";
+const LEGACY_STORAGE_KEY = "wordville-verb-detectives:v3";
 export const TOTAL_SCREENS = 15;
 
 type Saved = {

@@ -10,7 +10,8 @@ import {
 } from "react";
 import { stopSpeaking } from "./speech";
 
-const STORAGE_KEY = "wordville-verb-detectives:v2";
+const STORAGE_KEY = "wordville-verb-detectives:v3";
+const LEGACY_STORAGE_KEY = "wordville-verb-detectives:v2";
 export const TOTAL_SCREENS = 15;
 
 type Saved = {
@@ -18,6 +19,7 @@ type Saved = {
   completed: number[];
   attempts: Record<number, number>;
   data: Record<string, unknown>;
+  finished: boolean;
 };
 
 type GameContextValue = {
@@ -28,6 +30,9 @@ type GameContextValue = {
   back: () => void;
   goTo: (n: number) => void;
   restart: () => void;
+  /** Sessão concluída: o próximo carregamento começa do zero. */
+  finished: boolean;
+  finish: () => void;
   attempts: number;
   registerMiss: () => void;
   resetAttempts: () => void;
@@ -43,6 +48,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [completed, setCompleted] = useState<number[]>([]);
   const [attemptsByScreen, setAttemptsByScreen] = useState<Record<number, number>>({});
   const [data, setDataState] = useState<Record<string, unknown>>({});
+  const [finished, setFinished] = useState(false);
   const hydrated = useRef(false);
   const [, forceHydrated] = useState(0);
 

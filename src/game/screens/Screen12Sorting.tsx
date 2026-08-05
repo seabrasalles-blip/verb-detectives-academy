@@ -10,14 +10,19 @@ import { useGame, usePersistentState } from "@/game/state";
 
 type Group = "base" | "s";
 
-const SUBJECTS: { word: string; group: Group }[] = [
-  { word: "I", group: "base" },
-  { word: "You", group: "base" },
-  { word: "We", group: "base" },
-  { word: "They", group: "base" },
-  { word: "He", group: "s" },
-  { word: "She", group: "s" },
-  { word: "It", group: "s" },
+/**
+ * A classificação mistura pronomes e sujeitos nominais: a criança treina a
+ * substituição pronominal (Anna -> she) antes de escolher a forma do verbo.
+ */
+const SUBJECTS: { word: string; group: Group; pronoun: string }[] = [
+  { word: "I", group: "base", pronoun: "I" },
+  { word: "We", group: "base", pronoun: "we" },
+  { word: "The children", group: "base", pronoun: "they" },
+  { word: "Anna and Tom", group: "base", pronoun: "they" },
+  { word: "He", group: "s", pronoun: "he" },
+  { word: "She", group: "s", pronoun: "she" },
+  { word: "Anna", group: "s", pronoun: "she" },
+  { word: "The dog", group: "s", pronoun: "it" },
 ];
 
 const BOXES: { group: Group; title: string; color: string; left: number }[] = [
@@ -45,17 +50,21 @@ export function Screen12Sorting() {
       const nextPlaced = { ...placed, [word]: group };
       setPlaced(nextPlaced);
       if (Object.keys(nextPlaced).length === SUBJECTS.length) {
-        fb.correct("Caso resolvido! O sujeito ajuda a escolher a forma do verbo.", () =>
-          complete(12),
+        fb.stage(
+          "Etapa concluída! Você já sabe trocar o sujeito pelo pronome para escolher o verbo.",
+          () => complete(12),
         );
       }
     } else {
       // O card volta para a bandeja: nada é movido.
       registerMiss();
+      const secondTry = attempts >= 1;
       fb.wrong(
-        group === "s"
-          ? "Esse sujeito representa mais de uma pessoa ou é I/you. O verbo fica na forma básica."
-          : "Esse sujeito representa uma pessoa ou coisa só, como he, she ou it.",
+        secondTry
+          ? `${subject.word} pode ser trocado por ${subject.pronoun}, então fica no grupo ${
+              subject.group === "s" ? "goes / plays" : "go / play"
+            }.`
+          : `Por qual pronome você pode trocar ${subject.word}?`,
       );
     }
   };
@@ -65,7 +74,7 @@ export function Screen12Sorting() {
       <CharacterLayer pose="pointing" height={200} left={2} bottom={120} />
 
       <Instruction top={16} width={860}>
-        Toque em um sujeito e depois no grupo certo (ou arraste o card até o grupo).
+        Troque o sujeito por um pronome e toque no grupo certo (ou arraste o card até o grupo).
       </Instruction>
 
       {BOXES.map((box) => (
@@ -96,7 +105,7 @@ export function Screen12Sorting() {
               <span
                 key={s.word}
                 lang="en"
-                className="font-display rounded-[14px] border-4 border-[#58CDB5] bg-[#E8FBF5] px-4 py-1 text-[26px] leading-none font-extrabold text-[#1F7A67] motion-safe:animate-[wv-bounce_380ms_ease-out]"
+                className="font-display rounded-[14px] border-4 border-[#58CDB5] bg-[#E8FBF5] px-4 py-1 text-[22px] leading-none font-extrabold text-[#1F7A67] motion-safe:animate-[wv-bounce_380ms_ease-out]"
               >
                 {s.word} ✓
               </span>
@@ -130,7 +139,7 @@ export function Screen12Sorting() {
             onClick={() => setSelected(selected === s.word ? null : s.word)}
             aria-pressed={selected === s.word}
             aria-label={`Sujeito ${s.word}${selected === s.word ? ", selecionado" : ""}`}
-            className={`font-display min-h-[64px] min-w-[110px] cursor-grab rounded-[16px] border-4 px-6 py-2 text-[28px] leading-none font-extrabold transition-all duration-200 outline-none focus-visible:ring-4 focus-visible:ring-[#FFD76A] motion-safe:hover:-translate-y-[3px] ${
+            className={`font-display min-h-[64px] min-w-[110px] cursor-grab rounded-[16px] border-4 px-5 py-2 text-[26px] leading-none font-extrabold transition-all duration-200 outline-none focus-visible:ring-4 focus-visible:ring-[#FFD76A] motion-safe:hover:-translate-y-[3px] ${
               selected === s.word
                 ? "border-[#A995E8] bg-[#F1ECFF] text-[#463089] ring-4 ring-[#A995E8]/40"
                 : "border-[#24566B] bg-[#FFFDF5] text-[#183B4A]"
@@ -144,13 +153,13 @@ export function Screen12Sorting() {
 
       {finished && (
         <Note kind="conclusion" style={{ left: 300, top: 356, width: 720 }}>
-          O sujeito ajuda a escolher a forma do verbo.
+          Trocando o sujeito pelo pronome, descobrimos a forma certa do verbo.
         </Note>
       )}
 
       <HintButton
-        hint="Pense em quantas pessoas o sujeito representa."
-        strongHint="He, she e it ficam em goes/plays. I, you, we e they ficam em go/play."
+        hint="Pergunte: qual pronome pode substituir este sujeito?"
+        strongHint="Se o pronome for he, she ou it, o grupo é goes/plays. Se for I, you, we ou they, é go/play."
         attempts={attempts}
         left={200}
       />

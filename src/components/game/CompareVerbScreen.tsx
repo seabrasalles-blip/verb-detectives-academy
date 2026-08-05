@@ -198,27 +198,32 @@ export function CompareVerbScreen({
 
           {ruleExamples.length > 0 && (
             <div
-              className="absolute flex flex-col gap-2 rounded-[20px] border-4 border-[#52B7E8] bg-[#F4FAFF]/95 px-6 py-3"
-              style={{ left: 300, top: 396, width: 790 }}
+              className="absolute rounded-[20px] border-4 border-[#52B7E8] bg-[#F4FAFF]/95"
+              style={{ left: 300, top: 396, width: 790, height: 132 }}
             >
-              {ruleExamples.map((ex) => (
-                <div key={ex.text} className="flex items-center justify-between gap-4">
-                  <span lang="en" className="text-[26px] font-extrabold text-[#183B4A]">
+              {ruleExamples.map((ex, i) => (
+                <div key={ex.text}>
+                  <span
+                    lang="en"
+                    className="absolute text-[26px] font-extrabold text-[#183B4A]"
+                    style={{ left: 28, top: 16 + i * 58 }}
+                  >
                     {ex.text}
                   </span>
                   {ex.audio && (
                     <InlineAudioButton
                       text={ex.text}
                       {...(ex.audioLabel ? { label: ex.audioLabel } : {})}
-                      className="!relative"
                       width={112}
-                      style={{ position: "relative", bottom: 0 }}
+                      left={640}
+                      top={8 + i * 58}
                     />
                   )}
                 </div>
               ))}
             </div>
           )}
+
         </>
       ) : (
         <>

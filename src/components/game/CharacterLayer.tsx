@@ -9,29 +9,54 @@ const ALT: Record<LexPose, string> = {
 
 type Props = {
   pose: LexPose;
+  /** Altura do quadro da imagem (inclui margens transparentes do PNG). */
   height: number;
   left?: number;
   right?: number;
   bottom?: number;
+  top?: number;
   flip?: boolean;
+  /** Compensa margens transparentes do PNG sem distorcer. */
+  scale?: number;
+  transformOrigin?: string;
+  objectPosition?: string;
+  className?: string;
 };
 
-export function CharacterLayer({ pose, height, left, right, bottom = 0, flip = false }: Props) {
+export function CharacterLayer({
+  pose,
+  height,
+  left,
+  right,
+  bottom = 0,
+  top,
+  flip = false,
+  scale = 1,
+  transformOrigin = "bottom center",
+  objectPosition = "bottom center",
+  className = "",
+}: Props) {
   const width = height * LEX_RATIO[pose];
+  const transform = [flip ? "scaleX(-1)" : null, scale !== 1 ? `scale(${scale})` : null]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <img
-      src={LEX[pose]}
-      alt={ALT[pose]}
-      draggable={false}
-      className="pointer-events-none absolute select-none drop-shadow-[0_10px_16px_rgba(24,59,74,0.18)] motion-safe:animate-[wv-rise_500ms_ease-out]"
-      style={{
-        height,
-        width,
-        left,
-        right,
-        bottom,
-        transform: flip ? "scaleX(-1)" : undefined,
-      }}
-    />
+    <div
+      className="pointer-events-none absolute select-none"
+      style={{ width, height, left, right, bottom, top }}
+    >
+      <img
+        src={LEX[pose]}
+        alt={ALT[pose]}
+        draggable={false}
+        className={`h-full w-full select-none object-contain drop-shadow-[0_10px_16px_rgba(24,59,74,0.18)] motion-safe:animate-[wv-rise_500ms_ease-out] ${className}`}
+        style={{
+          objectPosition,
+          transformOrigin,
+          ...(transform ? { transform } : {}),
+        }}
+      />
+    </div>
   );
 }

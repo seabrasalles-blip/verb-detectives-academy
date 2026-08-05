@@ -1,20 +1,32 @@
-/** Faixa de instrução legível sobre qualquer cenário. */
+/** Faixa de instrução legível sobre qualquer cenário. Altura estável, máx. 2 linhas. */
 export function Instruction({
   children,
-  top = 30,
-  width = 720,
+  top = 18,
+  width = 760,
+  minHeight = 62,
 }: {
   children: React.ReactNode;
   top?: number;
   width?: number;
+  minHeight?: number;
 }) {
   return (
-    <p
-      className="absolute rounded-full border-4 border-[#52B7E8] px-7 py-2 text-center text-[22px] leading-snug font-bold text-[#183B4A] shadow-[0_4px_0_rgba(36,86,107,0.12)]"
-      style={{ top, width, left: (1200 - width) / 2, backgroundColor: "#FFFDF6" }}
+    <div
+      className="absolute flex items-center justify-center rounded-full border-4 border-[#52B7E8] px-8 shadow-[0_4px_0_rgba(36,86,107,0.12)]"
+      style={{
+        top,
+        width,
+        minHeight,
+        left: (1200 - width) / 2,
+        backgroundColor: "#FFFDF6",
+      }}
     >
-
-      {children}
-    </p>
+      <p
+        className="line-clamp-2 text-center text-[23px] leading-[1.2] font-bold text-[#183B4A]"
+        style={{ maxHeight: 56 }}
+      >
+        {children}
+      </p>
+    </div>
   );
 }

@@ -2,6 +2,7 @@ import { InlineAudioButton } from "@/components/game/AudioButton";
 import { CharacterLayer } from "@/components/game/CharacterLayer";
 import { FeedbackModal, useFeedback } from "@/components/game/FeedbackModal";
 import { Instruction } from "@/components/game/Instruction";
+import { InvestigationStepButton } from "@/components/game/InvestigationStepButton";
 import { Note } from "@/components/game/Note";
 import { ScreenFrame } from "@/components/game/ScreenFrame";
 import { PartCard, type Role } from "@/components/game/Sentence";
@@ -40,6 +41,16 @@ type Props = {
   ruleExamples?: { text: string; audio?: boolean; audioLabel?: string }[];
   /** Nota de conclusão usada quando não há fase de regra. */
   conclusionNote?: ReactNode;
+  /**
+   * Quando informado, a tela começa por uma fase de análise da frase-modelo
+   * (sujeito → verbo → complemento) antes da comparação.
+   */
+  analyzeModel?: {
+    instruction: string;
+    prompts: [string, string, string];
+    synthesis: string;
+    buttonLabel: string;
+  };
 };
 
 /** Colunas fixas: as duas frases ficam perfeitamente alinhadas. */
@@ -68,9 +79,15 @@ export function CompareVerbScreen({
   ruleSynthesis,
   ruleExamples = [],
   conclusionNote,
+  analyzeModel,
 }: Props) {
   const { complete, isDone, registerMiss } = useGame();
   const done = isDone(screen);
+  const [phase, setPhase] = usePersistentState<string>(
+    `${stateKey}.phase`,
+    analyzeModel ? "analyze-model" : "compare",
+  );
+  const [modelStep, setModelStep] = usePersistentState<number>(`${stateKey}.model`, 0);
   const [step, setStep] = usePersistentState<number>(`${stateKey}.step`, 0);
   const [answered, setAnswered] = usePersistentState<boolean>(`${stateKey}.answered`, false);
   const fb = useFeedback();
@@ -83,10 +100,29 @@ export function CompareVerbScreen({
   ];
 
   const current = steps[Math.min(step, steps.length - 1)]!;
-  const stepsDone = done || step >= steps.length;
+  const stepsDone = done || !!analyzeModel || step >= steps.length;
   const revealed = done || answered;
   const busy = fb.feedback !== null;
   const rulePhase = revealed && !!ruleGroups;
+  const analyzePhase = !!analyzeModel && !done && !revealed && phase === "analyze-model";
+  const modelDone = modelStep >= 3;
+
+  const modelTap = (t: CompareToken, index: number) => {
+    if (busy || modelDone) return;
+    if (index === modelStep) {
+      setModelStep(modelStep + 1);
+      fb.clue(
+        t.role === "subject"
+          ? "Isso! Esse é o sujeito: mostra quem realiza a ação."
+          : t.role === "verb"
+            ? "Isso! Esse é o verbo: mostra a ação."
+            : "Isso! Esse é o complemento: completa a ideia.",
+      );
+      return;
+    }
+    fb.clue("Leia a instrução de novo e procure a palavra pedida.");
+  };
+
 
   const tap = (t: CompareToken) => {
     if (stepsDone || busy) return;
@@ -129,7 +165,7 @@ export function CompareVerbScreen({
       </span>
       {tokens.map((t) => {
         const idx = steps.findIndex((s) => s.target === t.id);
-        const showRole = idx === -1 ? stepsDone : done || step > idx;
+        const showRole = idx === -1 ? stepsDone : done || !!analyzeModel || step > idx;
         const clickable = !stepsDone && !busy;
         return (
           <PartCard
@@ -160,16 +196,71 @@ export function CompareVerbScreen({
       )}
 
       <Instruction top={16} width={760}>
-        {rulePhase
-          ? ruleTitle
-          : revealed
-            ? "Descobrimos o que mudou nas duas frases."
-            : stepsDone
-              ? "O que mudou entre as duas frases?"
-              : current.prompt}
+        {analyzePhase && analyzeModel
+          ? modelDone
+            ? analyzeModel.instruction
+            : analyzeModel.prompts[Math.min(modelStep, 2) as 0 | 1 | 2]
+          : rulePhase
+            ? ruleTitle
+            : revealed
+              ? "Descobrimos o que mudou nas duas frases."
+              : stepsDone
+                ? "O que mudou entre as duas frases?"
+                : current.prompt}
       </Instruction>
 
-      {rulePhase && ruleGroups ? (
+      {analyzePhase && analyzeModel ? (
+        <>
+          <div
+            className="absolute rounded-[24px] border-4 border-[#52B7E8] bg-[#F4FAFF]/95 shadow-[0_4px_0_rgba(36,86,107,0.10)]"
+            style={{ left: PANEL_LEFT, top: 130, width: PANEL_WIDTH, height: 170 }}
+          />
+          <div
+            className="absolute flex items-start"
+            style={{ top: 152, left: ROW_LEFT, gap: GAP }}
+          >
+            {firstSentence.map((t, i) => {
+              const revealedRole = modelStep > i;
+              return (
+                <PartCard
+                  key={t.id}
+                  word={t.word}
+                  {...(revealedRole ? { role: t.role } : {})}
+                  question={t.question}
+                  labels={revealedRole}
+                  compactLabels
+                  size="sm"
+                  width={W[t.role]}
+                  {...(!modelDone && !busy ? { onClick: () => modelTap(t, i) } : {})}
+                  ariaLabel={`Palavra ${t.word}`}
+                />
+              );
+            })}
+          </div>
+
+          {modelDone && (
+            <>
+              <div
+                className="absolute rounded-[20px] border-4 border-[#52B7E8] bg-[#FFFDF6] px-8 py-3 text-center motion-safe:animate-[wv-rise_400ms_ease-out]"
+                style={{ left: 300, top: 322, width: 790 }}
+              >
+                <p className="line-clamp-2 text-[23px] leading-snug font-bold text-[#183B4A]">
+                  {analyzeModel.synthesis}
+                </p>
+              </div>
+              <InvestigationStepButton
+                left={450}
+                top={430}
+                width={300}
+                onClick={() => setPhase("compare")}
+              >
+                {analyzeModel.buttonLabel}
+              </InvestigationStepButton>
+            </>
+          )}
+        </>
+      ) : rulePhase && ruleGroups ? (
+
         <>
           {ruleGroups.map((g, i) => (
             <div

@@ -1,12 +1,13 @@
 import { MeaningVerbScreen } from "@/components/game/MeaningVerbScreen";
 import { SCENE } from "@/game/assets";
 
-/** 0 = observar · 1 = significado · 2 = análise completa */
+/** 0 = observar · 1 = significado (a análise da frase acontece na tela 11) */
 export function Screen09MeaningPlay() {
   return (
     <MeaningVerbScreen
       screen={9}
       stateKey="s9.phase"
+      withAnalysis={false}
       verb="PLAY"
       meaning={
         <>
@@ -22,12 +23,7 @@ export function Screen09MeaningPlay() {
       instructions={[
         "Observe a cena e leia a frase.",
         "O que a cena nos ajuda a entender?",
-        "Veja as partes da frase.",
-      ]}
-      tokens={[
-        { word: "They", role: "subject" },
-        { word: "play", role: "verb" },
-        { word: "soccer", role: "complement", question: "o quê?" },
+        "O que a cena nos ajuda a entender?",
       ]}
     />
   );

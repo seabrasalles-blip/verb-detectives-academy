@@ -26,12 +26,14 @@ type Props = {
   sceneAlt: string;
   /** Zoom interno da ilustração (compensa margens brancas do asset). */
   sceneScale?: number;
-  tokens: Token[];
+  tokens?: Token[];
   audioLabel: string;
   /** Instruções de cada estado. */
   instructions?: [string, string, string];
   /** Síntese curta abaixo da análise (máx. 2 linhas). */
   synthesis?: string;
+  /** Quando false, a tela termina no estado de significado (sem análise gramatical). */
+  withAnalysis?: boolean;
 };
 
 const DEFAULT_INSTRUCTIONS: [string, string, string] = [
@@ -55,27 +57,30 @@ export function MeaningVerbScreen({
   scene,
   sceneAlt,
   sceneScale = 1.28,
-  tokens,
+  tokens = [],
   audioLabel,
   instructions = DEFAULT_INSTRUCTIONS,
   synthesis = "O sujeito mostra quem realiza a ação; o verbo mostra a ação.",
+  withAnalysis = true,
 }: Props) {
   const { complete, isDone } = useGame();
   const [stored, setStored] = usePersistentState<number>(stateKey, 0);
   const done = isDone(screen);
-  const phase = done ? 2 : Math.min(Math.max(stored, 0), 2);
+  const maxPhase = withAnalysis ? 2 : 1;
+  const phase = done ? maxPhase : Math.min(Math.max(stored, 0), maxPhase);
 
   const advance = () => {
-    const next = Math.min(phase + 1, 2);
+    const next = Math.min(phase + 1, maxPhase);
     setStored(next);
-    if (next === 2) complete(screen);
+    if (next === maxPhase) complete(screen);
   };
 
   return (
-    <ScreenFrame background={BG.activity} showNext={phase === 2} nextEnabled={phase === 2}>
+    <ScreenFrame background={BG.activity} showNext={phase === maxPhase} nextEnabled={phase === maxPhase}>
       <Instruction top={18} width={720}>
         {instructions[phase as MeaningPhase]}
       </Instruction>
+
 
       <div
         className="absolute overflow-hidden rounded-[24px] border-4 border-[#24566B] bg-[#FFFDF6]"
@@ -116,7 +121,7 @@ export function MeaningVerbScreen({
         )}
       </div>
 
-      {phase === 2 && (
+      {withAnalysis && phase === 2 && (
         <div
           className="absolute flex flex-col items-center gap-3 motion-safe:animate-[wv-rise_400ms_ease-out]"
           style={{ left: 270, top: 392, width: 660 }}
@@ -130,7 +135,7 @@ export function MeaningVerbScreen({
         </div>
       )}
 
-      {phase < 2 && (
+      {phase < maxPhase && (
         <InvestigationStepButton left={450} top={430} width={300} onClick={advance}>
           {phase === 0 ? "Descobrir o significado" : "Analisar a frase"}
         </InvestigationStepButton>

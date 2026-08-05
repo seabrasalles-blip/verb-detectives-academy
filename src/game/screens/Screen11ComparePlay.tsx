@@ -5,6 +5,16 @@ export function Screen11ComparePlay() {
     <CompareVerbScreen
       screen={11}
       stateKey="s11"
+      analyzeModel={{
+        instruction: "Vamos analisar uma frase correta para testar nossa hipótese.",
+        prompts: [
+          "Toque em quem realiza a ação.",
+          "Toque na palavra que mostra a ação.",
+          "Toque na palavra que completa a ideia.",
+        ],
+        synthesis: "O sujeito mostra quem realiza a ação; o verbo mostra a ação.",
+        buttonLabel: "Comparar as frases",
+      }}
       firstSentence={[
         { id: "p1-sub", word: "They", role: "subject" },
         { id: "p1-verb", word: "play", role: "verb" },
@@ -21,7 +31,7 @@ export function Screen11ComparePlay() {
         { text: "Nada mudou nas duas frases.", correct: false },
       ]}
       conclusion="Você encontrou o padrão: com she, play muda para plays."
-      wrongHint="Compare as palavras que indicam a ação."
+      wrongHint="Compare as palavras que mostram a ação."
       ruleTitle="Descobrimos a regra do verbo play."
       ruleGroups={[
         { subjects: "I / You / We / They", verb: "PLAY" },

@@ -41,7 +41,7 @@ const TASKS: Task[] = [
   },
   {
     image: SCENE.twoKidsSchool,
-    alt: "Duas crianças com mochilas indo para a escola",
+    alt: "Duas crianças caminhando em direção à escola com mochilas.",
     cards: ["He", "They", "go", "goes", "to school"],
     answer: ["They", "go", "to school"],
     roles: ["subject", "verb", "complement"],

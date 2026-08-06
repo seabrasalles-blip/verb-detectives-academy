@@ -1,6 +1,6 @@
 import { CharacterLayer } from "@/components/game/CharacterLayer";
 import { DialogueBubble } from "@/components/game/DialogueBubble";
-import { FeedbackModal, useFeedback } from "@/components/game/FeedbackModal";
+import { FeedbackModal, FeedbackSlot, useFeedback } from "@/components/game/FeedbackModal";
 import { Instruction } from "@/components/game/Instruction";
 import { Note } from "@/components/game/Note";
 import { ScreenFrame } from "@/components/game/ScreenFrame";
@@ -19,19 +19,19 @@ export function Screen10NewInvestigation() {
   const investigating = done || phase > 0;
 
   const tap = (word: string) => {
+    if (fb.isOpen || done) return;
     if (word === "play") {
       if (!found.includes("play")) setFound([...found, "play"]);
-      fb.clue("Você encontrou o verbo. Será que ele também muda com she?", () =>
-        fb.hypothesis("Talvez play mude quando o sujeito é she.", () => complete(10)),
-      );
+      // Um único modal: a pista já fica registrada na nota da tela.
+      fb.hypothesis("Talvez play mude quando o sujeito é she.", () => complete(10));
       return;
     }
     if (word === "She") {
       if (!found.includes("She")) setFound([...found, "She"]);
-      fb.clue("Boa! She é o sujeito: mostra quem realiza a ação. Agora procure a ação.");
+      fb.clue("Isso! She é o sujeito. Agora procure a palavra que mostra a ação.");
       return;
     }
-    fb.clue("Essa palavra completa a ideia. Procure a palavra que mostra a ação.");
+    fb.clue("Essa parte completa a ideia. Procure a palavra que mostra a ação.");
   };
 
   const roleOf = (word: string) => {
@@ -97,6 +97,7 @@ export function Screen10NewInvestigation() {
         </button>
       )}
 
+      <FeedbackSlot inline={fb.inline} />
       <FeedbackModal feedback={fb.feedback} onClose={fb.close} />
     </ScreenFrame>
   );

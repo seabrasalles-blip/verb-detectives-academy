@@ -1,5 +1,5 @@
 import { CharacterLayer } from "@/components/game/CharacterLayer";
-import { FeedbackModal, useFeedback } from "@/components/game/FeedbackModal";
+import { FeedbackModal, FeedbackSlot, useFeedback } from "@/components/game/FeedbackModal";
 import { Instruction } from "@/components/game/Instruction";
 import { Note } from "@/components/game/Note";
 import { ScreenFrame } from "@/components/game/ScreenFrame";
@@ -67,6 +67,7 @@ export function Screen04Hypothesis() {
         </Note>
       )}
 
+      <FeedbackSlot inline={fb.inline} />
       <FeedbackModal feedback={fb.feedback} onClose={fb.close} />
     </ScreenFrame>
   );

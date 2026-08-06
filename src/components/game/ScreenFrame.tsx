@@ -12,6 +12,17 @@ type Props = {
   nextLabel?: string;
 };
 
+/** Métricas centralizadas dos botões globais de navegação. */
+const NAV_BUTTON_SIZE = {
+  back: 196,
+  next: 176,
+} as const;
+
+const NAV_BUTTON_POSITION = {
+  side: 20,
+  bottom: 20,
+} as const;
+
 /** Cenário + barra de navegação inferior, comum a todas as telas. */
 export function ScreenFrame({
   background,

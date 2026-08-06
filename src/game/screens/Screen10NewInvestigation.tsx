@@ -42,7 +42,7 @@ export function Screen10NewInvestigation() {
 
   return (
     <ScreenFrame background={BG.investigation} nextEnabled={done}>
-      <CharacterLayer pose="thinking" height={240} left={4} bottom={60} />
+      <CharacterLayer pose="thinking" placement="activityThinking" />
 
       {investigating ? (
         <Instruction top={20} width={640}>

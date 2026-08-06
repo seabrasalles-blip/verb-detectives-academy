@@ -94,7 +94,7 @@ export function RoundPractice({
 
   return (
     <ScreenFrame background={BG.activity} nextEnabled={done || lastDone}>
-      <CharacterLayer pose={pose} height={300} left={8} bottom={110} />
+      <CharacterLayer pose={pose} placement="activityPointing" height={310} bottom={110} />
 
       <Panel style={{ left: 452, top: 54, width: 512, height: 268 }}>
         <div className="flex h-full flex-col items-center justify-center gap-5 px-6 text-center">

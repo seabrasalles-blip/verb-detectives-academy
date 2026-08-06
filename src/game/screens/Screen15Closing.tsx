@@ -32,15 +32,7 @@ export function Screen15Closing() {
 
   return (
     <ScreenFrame background={BG.final} showBack={false} showNext={false}>
-      <CharacterLayer
-        pose="celebrating"
-        height={390}
-        right={16}
-        bottom={20}
-        scale={1.04}
-        transformOrigin="bottom right"
-        objectPosition="bottom right"
-      />
+      <CharacterLayer pose="celebrating" placement="finalCelebrating" />
 
       {/* Cabeçalho em faixa clara e opaca */}
       <div

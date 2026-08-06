@@ -196,9 +196,9 @@ export function CompareVerbScreen({
   return (
     <ScreenFrame background={BG.activity} showNext={revealed} nextEnabled={revealed}>
       {rulePhase ? (
-        <CharacterLayer pose="pointing" height={280} left={2} bottom={60} scale={1.08} />
+        <CharacterLayer pose="pointing" placement="rulePointing" />
       ) : (
-        <CharacterLayer pose="thinking" height={280} left={4} bottom={70} scale={1.1} />
+        <CharacterLayer pose="thinking" placement="activityThinking" />
       )}
 
       <Instruction top={16} width={760}>

@@ -33,7 +33,7 @@ export function Screen01Cover() {
         </p>
       </header>
 
-      <CharacterLayer pose="neutral" height={430} left={780} bottom={16} />
+      <CharacterLayer pose="neutral" placement="coverNeutral" />
 
       <AssetButton
         src={BTN.start}

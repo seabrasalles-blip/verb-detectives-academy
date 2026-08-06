@@ -13,7 +13,7 @@ const STEPS = [
 export function Screen02Case() {
   return (
     <ScreenFrame background={BG.investigation}>
-      <CharacterLayer pose="pointing" height={330} left={16} bottom={40} />
+      <CharacterLayer pose="pointing" placement="narrativePointing" />
 
       <DialogueBubble style={{ left: 300, top: 70, width: 700 }}>
         <p className="text-[27px] leading-snug font-bold">

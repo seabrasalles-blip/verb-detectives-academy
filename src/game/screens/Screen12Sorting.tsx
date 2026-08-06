@@ -76,7 +76,7 @@ export function Screen12Sorting() {
 
   return (
     <ScreenFrame background={BG.activity} nextEnabled={finished}>
-      <CharacterLayer pose="pointing" placement="activityPointing" height={300} bottom={110} />
+      <CharacterLayer pose="pointing" placement="activityPointing" height={300} bottom={132} />
 
       <Instruction top={16} width={860}>
         Toque em um sujeito e depois no grupo certo (ou arraste o card até o grupo).

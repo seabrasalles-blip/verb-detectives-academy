@@ -21,26 +21,19 @@ export function Screen03Poster() {
       </DialogueBubble>
 
       <SuspectPoster style={{ left: 350, top: 244, width: 560 }}>
-        <p
-          lang="en"
-          className="font-display text-center text-[52px] leading-none font-extrabold text-[#183B4A]"
-        >
+        <p lang="en" className="font-display text-center text-[52px] leading-none font-extrabold text-[#183B4A]">
           He go to school.
         </p>
       </SuspectPoster>
 
-      <AudioButton
-        text="He go to school."
-        label="Ouvir a frase encontrada no cartaz."
-        left={196}
-      />
+      <AudioButton text="He go to school." label="Ouvir a frase encontrada no cartaz." left={196} />
 
       <button
         type="button"
         onClick={() => complete(3)}
         className="font-display absolute bottom-[36px] left-[420px] cursor-pointer rounded-full border-4 border-[#52B7E8] bg-[#FFFDF6] px-8 py-3 text-[24px] font-extrabold text-[#1F6D96] shadow-[0_5px_0_rgba(36,86,107,0.16)] outline-none focus-visible:ring-4 focus-visible:ring-[#FFD76A] motion-safe:hover:-translate-y-[2px]"
       >
-        {found ? "Pista anotada ✓" : "Encontrei uma pista"}
+        {found ? "Vamos lá! ✓" : "Quero investigar!"}
       </button>
     </ScreenFrame>
   );

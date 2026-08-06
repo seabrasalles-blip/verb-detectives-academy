@@ -18,7 +18,7 @@ export function Screen09MeaningPlay() {
       translation="Eles jogam futebol."
       scene={SCENE.playSoccer}
       sceneAlt="Duas crianças jogando futebol juntas."
-      sceneScale={1.02}
+      sceneScale={1.07}
       audioLabel="Ouvir: They play soccer."
       instructions={[
         "Observe a cena e leia a frase.",

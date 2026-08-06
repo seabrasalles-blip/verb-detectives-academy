@@ -17,7 +17,7 @@ export function Screen05MeaningGo() {
       translation="Eu vou para a escola."
       scene={SCENE.goSchool}
       sceneAlt="Menino caminhando em direção à escola com uma mochila."
-      sceneScale={1.04}
+      sceneScale={1.08}
       audioLabel="Ouvir: I go to school."
       instructions={[
         "Observe a cena e leia a frase.",

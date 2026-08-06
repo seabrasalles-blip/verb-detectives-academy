@@ -187,7 +187,16 @@ export function Screen14Production() {
         ))}
       </div>
 
-      <ProgressMarker current={index + 1} total={TASKS.length} left={400} top={362} />
+      <ProgressMarker
+        current={index + 1}
+        total={TASKS.length}
+        label={`Frase ${index + 1} de ${TASKS.length}`}
+        left={780}
+        top={360}
+        width={420}
+        centered
+        variant="card"
+      />
 
       {!solved && (
         <button
@@ -212,7 +221,7 @@ export function Screen14Production() {
         }
       />
 
-      <FeedbackSlot inline={fb.inline} left={400} top={432} width={520} />
+      <FeedbackSlot inline={fb.inline} left={470} top={430} width={620} />
       <FeedbackModal feedback={fb.feedback} onClose={fb.close} />
     </ScreenFrame>
   );

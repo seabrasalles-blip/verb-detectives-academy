@@ -120,9 +120,18 @@ export function RoundPractice({
         </div>
       </Panel>
 
-      <ProgressMarker current={safeIndex + 1} total={rounds.length} left={452} top={332} />
+      <ProgressMarker
+        current={safeIndex + 1}
+        total={rounds.length}
+        left={708}
+        top={342}
+        width={430}
+        centered
+        variant="card"
+      />
 
-      <div className="absolute bottom-[130px] left-[380px] flex w-[760px] justify-center gap-9">
+      <div className="absolute top-[430px] left-[380px] flex w-[760px] justify-center gap-9">
+
         {round.options.map((option) => (
           <WordOption
             key={option}

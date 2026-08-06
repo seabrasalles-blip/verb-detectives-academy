@@ -1,10 +1,25 @@
 import { AssetButton } from "@/components/game/AssetButton";
 import { CharacterLayer } from "@/components/game/CharacterLayer";
-import { Panel } from "@/components/game/Panel";
 import { ScreenFrame } from "@/components/game/ScreenFrame";
 import { BG, BTN } from "@/game/assets";
 import { useGame } from "@/game/state";
 import { useEffect } from "react";
+
+/** Selo de conquista em HTML/CSS puro (sem asset novo, sem emoji). */
+function DetectiveBadge() {
+  return (
+    <div
+      className="flex h-[86px] w-[86px] shrink-0 flex-col items-center justify-center rounded-full border-4 border-[#52B7E8] bg-[#FFF3CC] text-center shadow-[0_3px_0_rgba(36,86,107,0.12)] motion-safe:animate-[wv-rise_600ms_ease-out]"
+      aria-hidden="true"
+    >
+      <span className="font-display text-[13px] leading-[1.05] font-extrabold tracking-wide text-[#24566B]">
+        VERB
+        <br />
+        DETECTIVE
+      </span>
+    </div>
+  );
+}
 
 export function Screen15Closing() {
   const { restart, finish } = useGame();
@@ -17,70 +32,98 @@ export function Screen15Closing() {
 
   return (
     <ScreenFrame background={BG.final} showBack={false} showNext={false}>
-      <CharacterLayer pose="celebrating" height={330} right={20} bottom={16} />
+      <CharacterLayer
+        pose="celebrating"
+        height={390}
+        right={16}
+        bottom={20}
+        scale={1.04}
+        transformOrigin="bottom right"
+        objectPosition="bottom right"
+      />
 
-      <div className="absolute top-[36px] left-[70px] w-[640px] text-center">
-        <h2
-          className="font-display text-[46px] leading-none font-extrabold text-[#FFFDF6]"
-          style={{ textShadow: "0 4px 0 #24566B" }}
-        >
-          Você virou um Verb Detective!
-        </h2>
+      {/* Cabeçalho em faixa clara e opaca */}
+      <div
+        className="absolute flex items-center gap-4 rounded-[26px] border-4 border-[#24566B] bg-[#FFFDF6] px-6 py-3 shadow-[0_4px_0_rgba(36,86,107,0.12)] motion-safe:animate-[wv-rise_450ms_ease-out]"
+        style={{ left: 64, top: 26, width: 736, height: 96 }}
+      >
+        <DetectiveBadge />
+        <div className="flex-1 text-center">
+          <h2
+            lang="en"
+            className="font-display text-[48px] leading-none font-extrabold text-[#B93B2B]"
+          >
+            Case solved!
+          </h2>
+          <p className="mt-1 text-[26px] leading-none font-bold text-[#183B4A]">
+            Você se tornou um Verb Detective!
+          </p>
+        </div>
       </div>
 
-      <Panel style={{ left: 70, top: 108, width: 300, height: 150 }}>
-        <div className="flex h-full flex-col items-center justify-center gap-1 text-center">
-          <p lang="en" className="font-display text-[38px] leading-none font-extrabold text-[#FF786A]">
-            GO
-          </p>
-          <p className="text-[22px] font-bold text-[#183B4A]">= ir</p>
-          <p lang="en" className="font-display mt-1 text-[38px] leading-none font-extrabold text-[#FF786A]">
-            PLAY
-          </p>
-          <p className="text-[22px] font-bold text-[#183B4A]">= brincar ou jogar</p>
-        </div>
-      </Panel>
+      {/* Painel único de síntese */}
+      <div
+        className="absolute rounded-[28px] border-4 border-[#52B7E8] bg-[#FFFDF6] p-7 shadow-[0_4px_0_rgba(36,86,107,0.10)] motion-safe:animate-[wv-rise_550ms_ease-out]"
+        style={{ left: 64, top: 142, width: 736, height: 356 }}
+      >
+        <div className="flex h-full flex-col justify-between">
+          <div>
+            <p className="text-[19px] font-bold text-[#24566B]">Você descobriu os verbos</p>
+            <div className="mt-1 flex items-center gap-10">
+              <p className="text-[29px] font-extrabold text-[#183B4A]">
+                <span lang="en" className="font-display text-[#FF786A]">
+                  GO
+                </span>{" "}
+                = ir
+              </p>
+              <p className="text-[29px] font-extrabold text-[#183B4A]">
+                <span lang="en" className="font-display text-[#FF786A]">
+                  PLAY
+                </span>{" "}
+                = brincar ou jogar
+              </p>
+            </div>
+          </div>
 
-      <Panel style={{ left: 396, top: 108, width: 340, height: 150 }}>
-        <div className="flex h-full flex-col items-center justify-center gap-1 text-center">
-          <p lang="en" className="font-display text-[24px] leading-none font-extrabold text-[#463089]">
-            I / You / We / They
-          </p>
-          <p lang="en" className="font-display text-[30px] leading-none font-extrabold text-[#B93B2B]">
-            go / play
-          </p>
-          <p lang="en" className="font-display mt-2 text-[24px] leading-none font-extrabold text-[#463089]">
-            He / She / It
-          </p>
-          <p lang="en" className="font-display text-[30px] leading-none font-extrabold text-[#B93B2B]">
-            goe<span className="rounded bg-[#FFD76A] px-1 text-[#7A4E00]">s</span> / play
-            <span className="rounded bg-[#FFD76A] px-1 text-[#7A4E00]">s</span>
-          </p>
-        </div>
-      </Panel>
+          <div>
+            <p className="text-[19px] font-bold text-[#24566B]">Você descobriu o padrão</p>
+            <div className="mt-1 space-y-1">
+              <p lang="en" className="font-display text-[27px] leading-tight font-extrabold">
+                <span className="text-[#463089]">I / You / We / They</span>
+                <span className="px-2 text-[#24566B]">→</span>
+                <span className="text-[#FF786A]">go / play</span>
+              </p>
+              <p lang="en" className="font-display text-[27px] leading-tight font-extrabold">
+                <span className="text-[#463089]">He / She / It</span>
+                <span className="px-2 text-[#24566B]">→</span>
+                <span className="text-[#FF786A]">
+                  go<span className="rounded bg-[#FFD76A] px-1 text-[#7A4E00]">es</span> / play
+                  <span className="rounded bg-[#FFD76A] px-1 text-[#7A4E00]">s</span>
+                </span>
+              </p>
+            </div>
+          </div>
 
-      <Panel tone="paper" style={{ left: 70, top: 274, width: 666, height: 130 }}>
-        <div className="flex h-full flex-col items-center justify-center gap-1 text-center">
-          <p className="text-[21px] font-bold text-[#183B4A]">
-            <strong className="text-[#463089]">Sujeito:</strong> quem realiza a ação. ·{" "}
-            <strong className="text-[#B93B2B]">Verbo:</strong> a palavra que mostra a ação.
-          </p>
-          <p className="text-[21px] font-bold text-[#183B4A]">
-            Com he, she e it, o verbo muda. Geralmente acrescentamos s.
-          </p>
-          <p className="text-[21px] font-bold text-[#183B4A]">
-            No verbo go, acrescentamos es: <span lang="en">goes</span>.
-          </p>
+          <div className="border-t-2 border-[#CBE6F5] pt-3">
+            <p className="text-[21px] leading-snug font-bold text-[#183B4A]">
+              <strong className="text-[#463089]">Sujeito:</strong> quem realiza a ação. ·{" "}
+              <strong className="text-[#B93B2B]">Verbo:</strong> a palavra que mostra a ação.
+            </p>
+            <p className="text-[21px] leading-snug font-bold text-[#183B4A]">
+              Com <span lang="en">he</span>, <span lang="en">she</span> e <span lang="en">it</span>,
+              acrescentamos s; em <span lang="en">go</span>, acrescentamos es.
+            </p>
+          </div>
         </div>
-      </Panel>
+      </div>
 
       <AssetButton
         src={BTN.restart}
-        width={190}
+        width={205}
         floating
         label="Recomeçar a investigação desde o início"
         onClick={restart}
-        style={{ left: 310, bottom: 30 }}
+        style={{ left: 330, bottom: 25 }}
       />
     </ScreenFrame>
   );

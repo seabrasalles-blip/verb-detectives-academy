@@ -47,19 +47,19 @@ export function ScreenFrame({
       {showBack && screen > 1 && (
         <AssetButton
           src={BTN.back}
-          width={158}
+          width={NAV_BUTTON_SIZE.back}
           label="Voltar para a tela anterior"
           onClick={back}
-          style={{ left: 24, bottom: 24 }}
+          style={{ left: NAV_BUTTON_POSITION.side, bottom: NAV_BUTTON_POSITION.bottom }}
         />
       )}
       {showNext && nextEnabled && (
         <AssetButton
           src={BTN.next}
-          width={176}
+          width={NAV_BUTTON_SIZE.next}
           label={nextLabel}
           onClick={next}
-          style={{ right: 24, bottom: 24 }}
+          style={{ right: NAV_BUTTON_POSITION.side, bottom: NAV_BUTTON_POSITION.bottom }}
         />
       )}
     </div>

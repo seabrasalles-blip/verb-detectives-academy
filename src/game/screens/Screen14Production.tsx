@@ -23,7 +23,7 @@ type Task = {
 const TASKS: Task[] = [
   {
     image: SCENE.girlSoccer,
-    alt: "Uma menina jogando futebol",
+    alt: "Uma menina conduzindo uma bola de futebol.",
     cards: ["She", "They", "play", "plays", "soccer"],
     answer: ["She", "plays", "soccer"],
     roles: ["subject", "verb", "complement"],
@@ -41,7 +41,7 @@ const TASKS: Task[] = [
   },
   {
     image: SCENE.twoKidsSchool,
-    alt: "Duas crianças com mochilas indo para a escola",
+    alt: "Duas crianças caminhando em direção à escola com mochilas.",
     cards: ["He", "They", "go", "goes", "to school"],
     answer: ["They", "go", "to school"],
     roles: ["subject", "verb", "complement"],

@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { CharacterLayer } from "@/components/game/CharacterLayer";
-import { FeedbackModal, useFeedback } from "@/components/game/FeedbackModal";
+import { FeedbackModal, FeedbackSlot, useFeedback } from "@/components/game/FeedbackModal";
 import { HintButton } from "@/components/game/HintButton";
 import { Instruction } from "@/components/game/Instruction";
 import { Note } from "@/components/game/Note";
@@ -36,8 +36,10 @@ export function Screen12Sorting() {
   const remaining = SUBJECTS.filter((s) => !placed[s.word]);
   const finished = done || remaining.length === 0;
 
+  const [misses, setMisses] = usePersistentState<number>("s12.misses", 0);
+
   const drop = (group: Group, word: string | null) => {
-    if (!word) return;
+    if (!word || fb.isOpen || finished) return;
     const subject = SUBJECTS.find((s) => s.word === word);
     if (!subject) return;
     setSelected(null);
@@ -45,18 +47,30 @@ export function Screen12Sorting() {
       const nextPlaced = { ...placed, [word]: group };
       setPlaced(nextPlaced);
       if (Object.keys(nextPlaced).length === SUBJECTS.length) {
-        fb.correct("Caso resolvido! O sujeito ajuda a escolher a forma do verbo.", () =>
-          complete(12),
+        fb.conclusion("O sujeito ajuda a escolher a forma do verbo.", () => complete(12), {
+          title: "Caso resolvido",
+        });
+      } else {
+        fb.ok(
+          group === "base"
+            ? `Isso! ${word} usa go ou play.`
+            : `Isso! ${word} usa goes ou plays.`,
         );
       }
     } else {
       // O card volta para a bandeja: nada é movido.
       registerMiss();
-      fb.wrong(
+      const next = misses + 1;
+      setMisses(next);
+      const specific =
         group === "s"
-          ? "Esse sujeito representa mais de uma pessoa ou é I/you. O verbo fica na forma básica."
-          : "Esse sujeito representa uma pessoa ou coisa só, como he, she ou it.",
-      );
+          ? "I, you, we e they usam go/play."
+          : "He, she e it usam goes/plays.";
+      const general =
+        group === "s"
+          ? "Esse sujeito pertence ao grupo que usa a forma básica do verbo."
+          : "Esse sujeito pertence ao grupo em que o verbo muda.";
+      fb.wrong(next >= 2 ? `${general} ${specific}` : general);
     }
   };
 
@@ -155,6 +169,7 @@ export function Screen12Sorting() {
         left={200}
       />
 
+      <FeedbackSlot inline={fb.inline} left={330} top={566} width={540} />
       <FeedbackModal feedback={fb.feedback} onClose={fb.close} />
     </ScreenFrame>
   );

@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { GameStage } from "@/components/game/GameStage";
 import { ALL_ASSETS } from "@/game/assets";
 import { GameProvider, useGame } from "@/game/state";
+import { ResumeProgressGate } from "@/components/game/ResumeProgressModal";
 import { Screen01Cover } from "@/game/screens/Screen01Cover";
 import { Screen02Case } from "@/game/screens/Screen02Case";
 import { Screen03Poster } from "@/game/screens/Screen03Poster";
@@ -56,8 +57,10 @@ const SCREENS = [
 ];
 
 function ScreenRouter() {
-  const { screen } = useGame();
-  const Current = SCREENS[screen - 1] ?? Screen01Cover;
+  const { screen, hydrationStatus } = useGame();
+  // Antes da decisão nunca mostramos a tela salva: só a capa, sem interação.
+  const pending = hydrationStatus !== "ready";
+  const Current = (pending ? Screen01Cover : SCREENS[screen - 1]) ?? Screen01Cover;
 
   useEffect(() => {
     ALL_ASSETS.forEach((url) => {
@@ -67,7 +70,12 @@ function ScreenRouter() {
   }, []);
 
   return (
-    <main key={screen} className="absolute inset-0">
+    <main
+      key={pending ? "pending" : screen}
+      className="absolute inset-0"
+      aria-hidden={pending}
+      style={pending ? { pointerEvents: "none" } : undefined}
+    >
       <h1 className="sr-only">Wordville – Verb Detectives</h1>
       <Current />
     </main>
@@ -79,6 +87,7 @@ function Index() {
     <GameProvider>
       <GameStage>
         <ScreenRouter />
+        <ResumeProgressGate />
       </GameStage>
     </GameProvider>
   );

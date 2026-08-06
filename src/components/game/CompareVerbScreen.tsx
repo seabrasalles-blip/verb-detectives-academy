@@ -1,6 +1,6 @@
 import { InlineAudioButton } from "@/components/game/AudioButton";
 import { CharacterLayer } from "@/components/game/CharacterLayer";
-import { FeedbackModal, useFeedback } from "@/components/game/FeedbackModal";
+import { FeedbackModal, FeedbackSlot, useFeedback } from "@/components/game/FeedbackModal";
 import { Instruction } from "@/components/game/Instruction";
 import { InvestigationStepButton } from "@/components/game/InvestigationStepButton";
 import { Note } from "@/components/game/Note";
@@ -102,7 +102,7 @@ export function CompareVerbScreen({
   const current = steps[Math.min(step, steps.length - 1)]!;
   const stepsDone = done || !!analyzeModel || step >= steps.length;
   const revealed = done || answered;
-  const busy = fb.feedback !== null;
+  const busy = fb.isOpen;
   const rulePhase = revealed && !!ruleGroups;
   const analyzePhase = !!analyzeModel && !done && !revealed && phase === "analyze-model";
   const modelDone = modelStep >= 3;
@@ -111,16 +111,22 @@ export function CompareVerbScreen({
     if (busy || modelDone) return;
     if (index === modelStep) {
       setModelStep(modelStep + 1);
-      fb.clue(
+      fb.ok(
         t.role === "subject"
-          ? "Isso! Esse é o sujeito: mostra quem realiza a ação."
+          ? `Isso! ${t.word} é o sujeito.`
           : t.role === "verb"
-            ? "Isso! Esse é o verbo: mostra a ação."
-            : "Isso! Esse é o complemento: completa a ideia.",
+            ? `Isso! ${t.word} é o verbo.`
+            : `Isso! ${t.word} completa a ideia.`,
       );
       return;
     }
-    fb.clue("Leia a instrução de novo e procure a palavra pedida.");
+    fb.nudge(
+      t.role === "complement"
+        ? "Essa parte completa a ideia. Leia a instrução de novo."
+        : t.role === "subject"
+          ? "Essa parte mostra quem realiza a ação. Leia a instrução de novo."
+          : "Essa parte mostra a ação. Leia a instrução de novo.",
+    );
   };
 
 
@@ -128,19 +134,19 @@ export function CompareVerbScreen({
     if (stepsDone || busy) return;
     if (t.id === current.target) {
       setStep(step + 1);
-      fb.clue(
+      fb.ok(
         t.role === "subject"
-          ? "Isso! Esse é o sujeito: mostra quem realiza a ação."
-          : "Isso! Esse é o verbo: mostra a ação.",
+          ? `Isso! ${t.suffix ? t.word + t.suffix : t.word} é o sujeito.`
+          : `Isso! ${t.suffix ? t.word + t.suffix : t.word} é o verbo.`,
       );
       return;
     }
-    fb.clue(
+    fb.nudge(
       t.role === "complement"
-        ? "Essa palavra completa a ideia. Procure a palavra pedida na instrução."
+        ? "Essa parte completa a ideia. Procure a parte pedida na instrução."
         : t.role === "subject"
-          ? "Essa palavra mostra quem realiza a ação. Leia a instrução de novo."
-          : "Essa palavra mostra a ação. Leia a instrução de novo.",
+          ? "Essa parte mostra quem realiza a ação. Leia a instrução de novo."
+          : "Essa parte mostra a ação. Leia a instrução de novo.",
     );
   };
 
@@ -148,7 +154,7 @@ export function CompareVerbScreen({
     if (revealed || busy) return;
     if (opt.correct) {
       setAnswered(true);
-      fb.conclusion(conclusion, () => complete(screen));
+      fb.conclusion(conclusion, () => complete(screen), { title: "Descoberta confirmada" });
     } else {
       registerMiss();
       fb.wrong(wrongHint);
@@ -361,6 +367,7 @@ export function CompareVerbScreen({
         </>
       )}
 
+      <FeedbackSlot inline={fb.inline} />
       <FeedbackModal feedback={fb.feedback} onClose={fb.close} />
     </ScreenFrame>
   );

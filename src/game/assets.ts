@@ -1,5 +1,5 @@
 import bgCover from "@/assets/bg-cover.jpg.asset.json";
-import bgInvestigation from "@/assets/bg-investigation-room.jpg.asset.json";
+import bgInvestigation from "@/assets/bg-investigation-room-v2.png";
 import bgActivity from "@/assets/bg-activity.jpg.asset.json";
 import bgFinal from "@/assets/bg-final.jpg.asset.json";
 import lexNeutral from "@/assets/lex-neutral.png.asset.json";
@@ -19,7 +19,7 @@ import sceneTwoKidsSchool from "@/assets/scene-two-kids-school-v2.png";
 
 export const BG = {
   cover: bgCover.url,
-  investigation: bgInvestigation.url,
+  investigation: bgInvestigation,
   activity: bgActivity.url,
   final: bgFinal.url,
 } as const;

@@ -34,6 +34,7 @@ function ResumeProgressModal({
       if (!nodes || nodes.length === 0) return;
       const first = nodes[0];
       const last = nodes[nodes.length - 1];
+      if (!first || !last) return;
       const active = document.activeElement;
       if (e.shiftKey && (active === first || !cardRef.current?.contains(active))) {
         e.preventDefault();

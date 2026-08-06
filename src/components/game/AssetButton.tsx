@@ -32,7 +32,7 @@ export function AssetButton({
       title={label}
       disabled={disabled}
       onClick={onClick}
-      className={`group absolute cursor-pointer border-0 bg-transparent p-0 outline-none transition-transform duration-200 ease-out focus-visible:ring-4 focus-visible:ring-[#FFD76A] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent disabled:cursor-not-allowed disabled:opacity-45 motion-safe:hover:scale-[1.04] motion-safe:active:scale-[0.97] disabled:hover:scale-100 rounded-full ${
+      className={`group absolute cursor-pointer border-0 bg-transparent p-0 outline-none transition-transform duration-200 ease-out focus-visible:ring-4 focus-visible:ring-[#FFD76A] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent disabled:cursor-not-allowed disabled:opacity-45 motion-safe:hover:scale-[1.04] motion-safe:active:scale-[0.97] disabled:hover:scale-100 rounded-[26px] min-h-[56px] min-w-[56px] ${
         floating ? "motion-safe:animate-[wv-float_2.6s_ease-in-out_infinite]" : ""
       } ${className}`}
       style={{ width, ...style }}

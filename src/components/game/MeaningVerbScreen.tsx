@@ -96,30 +96,41 @@ export function MeaningVerbScreen({
         />
       </div>
 
-      <div className="absolute" style={{ left: 440, top: phase === 0 ? 190 : 108, width: 620 }}>
+      {/* Card único de conteúdo: verbo, frase, significado e tradução. */}
+      <div
+        className="absolute flex flex-col justify-center rounded-[24px] border-4 border-[#52B7E8] px-8 py-6 shadow-[0_6px_0_rgba(36,86,107,0.12)]"
+        style={{
+          left: 445,
+          top: 120,
+          width: 640,
+          minHeight: phase === 0 ? 150 : phase === 2 ? 240 : 265,
+          backgroundColor: "#FFFDF6",
+        }}
+      >
         {phase >= 1 && (
           <p
-            className="font-display text-[58px] leading-none font-extrabold text-[#FF786A] motion-safe:animate-[wv-rise_400ms_ease-out]"
+            className="font-display text-[56px] leading-none font-extrabold text-[#FF786A] motion-safe:animate-[wv-rise_400ms_ease-out]"
             lang="en"
           >
             {verb}
           </p>
         )}
         <p
-          className={`text-[36px] leading-none font-extrabold text-[#183B4A] ${phase >= 1 ? "mt-3" : ""}`}
+          className={`text-[36px] leading-tight font-extrabold text-[#183B4A] ${phase >= 1 ? "mt-3" : ""}`}
           lang="en"
         >
           {phrase}
         </p>
         {phase >= 1 && (
-          <div className="mt-4 motion-safe:animate-[wv-rise_400ms_ease-out]">
+          <div className="mt-5 motion-safe:animate-[wv-rise_400ms_ease-out]">
             <p className="text-[24px] leading-snug font-bold text-[#183B4A]">{meaning}</p>
-            <p className="mt-1 text-[24px] leading-snug font-semibold text-[#24566B]">
+            <p className="mt-1.5 text-[23px] leading-snug font-semibold text-[#24566B]">
               {translation}
             </p>
           </div>
         )}
       </div>
+
 
       {withAnalysis && phase === 2 && (
         <div

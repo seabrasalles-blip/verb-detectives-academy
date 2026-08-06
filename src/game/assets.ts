@@ -12,10 +12,10 @@ import btnBack from "@/assets/btn-back.png.asset.json";
 import btnAudio from "@/assets/btn-audio.png.asset.json";
 import btnHint from "@/assets/btn-hint.png.asset.json";
 import btnRestart from "@/assets/btn-restart.png.asset.json";
-import sceneGoSchool from "@/assets/scene-go-school.png";
-import scenePlaySoccer from "@/assets/scene-play-soccer.png";
-import sceneGirlSoccer from "@/assets/scene-girl-soccer.png";
-import sceneTwoKidsSchool from "@/assets/scene-two-kids-school.png";
+import sceneGoSchool from "@/assets/scene-go-school-v2.png";
+import scenePlaySoccer from "@/assets/scene-play-soccer-v2.png";
+import sceneGirlSoccer from "@/assets/scene-girl-soccer-v2.png";
+import sceneTwoKidsSchool from "@/assets/scene-two-kids-school-v2.png";
 
 export const BG = {
   cover: bgCover.url,

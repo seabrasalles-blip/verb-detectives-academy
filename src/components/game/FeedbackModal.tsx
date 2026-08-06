@@ -158,7 +158,7 @@ export function FeedbackSlot({
   const style = inline ? INLINE_STYLE[inline.tone] : null;
   return (
     <div
-      className={`absolute flex items-center justify-center ${className}`}
+      className={`pointer-events-none absolute flex items-center justify-center ${className}`}
       style={{ left, top, width, height: 62 }}
       role="status"
       aria-live="polite"
@@ -167,7 +167,7 @@ export function FeedbackSlot({
       {inline && style && (
         <p
           key={inline.id}
-          className="flex min-h-[54px] items-center rounded-full border-4 px-6 text-center text-[20px] leading-tight font-bold motion-safe:animate-[wv-rise_220ms_ease-out]"
+          className="pointer-events-none flex min-h-[54px] items-center rounded-full border-4 px-6 text-center text-[20px] leading-tight font-bold motion-safe:animate-[wv-rise_220ms_ease-out]"
           style={{ borderColor: style.border, backgroundColor: style.bg, color: style.color }}
         >
           {inline.message}

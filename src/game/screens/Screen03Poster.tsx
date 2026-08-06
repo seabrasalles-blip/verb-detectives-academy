@@ -12,7 +12,7 @@ export function Screen03Poster() {
 
   return (
     <ScreenFrame background={BG.investigation} nextEnabled={found}>
-      <CharacterLayer pose="thinking" height={300} left={12} bottom={40} />
+      <CharacterLayer pose="thinking" placement="narrativeThinking" />
 
       <DialogueBubble style={{ left: 286, top: 34, width: 690 }}>
         <p className="text-[25px] leading-snug font-bold">

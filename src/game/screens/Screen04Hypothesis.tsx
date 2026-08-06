@@ -39,7 +39,7 @@ export function Screen04Hypothesis() {
 
   return (
     <ScreenFrame background={BG.investigation} nextEnabled={done}>
-      <CharacterLayer pose="pointing" height={250} left={4} bottom={40} />
+      <CharacterLayer pose="pointing" placement="activityPointing" />
 
       <Instruction top={22} width={640}>
         Toque na palavra que você gostaria de investigar.

@@ -27,7 +27,7 @@ export function Screen07ConclusionGo() {
 
   return (
     <ScreenFrame background={BG.activity} nextEnabled={phase === 2}>
-      <CharacterLayer pose="pointing" height={290} left={2} bottom={40} scale={1.1} />
+      <CharacterLayer pose="pointing" placement="rulePointing" />
 
       <Instruction top={16} width={720}>
         {phase === 1

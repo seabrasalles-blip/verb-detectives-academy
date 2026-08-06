@@ -1,6 +1,6 @@
 import { AudioButton } from "@/components/game/AudioButton";
 import { CharacterLayer } from "@/components/game/CharacterLayer";
-import { FeedbackModal, useFeedback } from "@/components/game/FeedbackModal";
+import { FeedbackModal, FeedbackSlot, useFeedback } from "@/components/game/FeedbackModal";
 import { HintButton } from "@/components/game/HintButton";
 import { Panel } from "@/components/game/Panel";
 import { ProgressMarker } from "@/components/game/ProgressMarker";
@@ -8,6 +8,7 @@ import { ScreenFrame } from "@/components/game/ScreenFrame";
 import { WordOption } from "@/components/game/WordOption";
 import { BG, type LexPose } from "@/game/assets";
 import { useGame, usePersistentState } from "@/game/state";
+import { useRef } from "react";
 
 export type Round = {
   /** Sujeito da frase (antes da lacuna). */
@@ -16,7 +17,10 @@ export type Round = {
   options: [string, string];
   answer: string;
   success: string;
+  /** Primeira tentativa incorreta: orientação geral. */
   error: string;
+  /** Tentativas seguintes: pista mais específica (sem entregar a resposta). */
+  error2?: string;
 };
 
 type Props = {
@@ -51,6 +55,8 @@ export function RoundPractice({
     null,
   );
   const fb = useFeedback();
+  const sentenceRef = useRef<HTMLParagraphElement>(null);
+  const [misses, setMisses] = usePersistentState<number>(`${storageKey}.misses`, 0);
 
   const safeIndex = Math.min(index, rounds.length - 1);
   const round = rounds[safeIndex]!;
@@ -58,7 +64,8 @@ export function RoundPractice({
   const fullSentence = `${round.before} ${round.answer} ${round.after}`;
 
   const pick = (option: string) => {
-    if (showAnswer) return;
+    // Bloqueia cliques repetidos enquanto o modal estiver aberto.
+    if (showAnswer || fb.isOpen) return;
     if (option === round.answer) {
       setWrongOption(null);
       setRevealed(true);
@@ -69,12 +76,17 @@ export function RoundPractice({
         }
         setIndex(safeIndex + 1);
         setRevealed(false);
+        setMisses(0);
         resetAttempts();
+        // O foco vai para a nova frase, não para uma alternativa que mudou.
+        window.setTimeout(() => sentenceRef.current?.focus(), 0);
       });
     } else {
       registerMiss();
       setWrongOption(option);
-      fb.wrong(round.error);
+      const next = misses + 1;
+      setMisses(next);
+      fb.wrong(next >= 2 && round.error2 ? round.error2 : round.error);
     }
   };
 
@@ -91,7 +103,9 @@ export function RoundPractice({
           </h2>
           <p
             lang="en"
-            className="font-display text-[40px] leading-tight font-extrabold text-[#183B4A]"
+            ref={sentenceRef}
+            tabIndex={-1}
+            className="font-display text-[40px] outline-none leading-tight font-extrabold text-[#183B4A]"
           >
             <span className="text-[#463089]">{round.before}</span>{" "}
             {showAnswer ? (
@@ -113,7 +127,7 @@ export function RoundPractice({
           <WordOption
             key={option}
             size="lg"
-            disabled={showAnswer}
+            disabled={showAnswer || fb.isOpen}
             state={
               showAnswer && option === round.answer
                 ? "correct"
@@ -141,7 +155,16 @@ export function RoundPractice({
       />
       <HintButton hint={hint} strongHint={strongHint} attempts={attempts} left={370} />
 
-      <FeedbackModal feedback={fb.feedback} onClose={fb.close} />
+      <FeedbackSlot inline={fb.inline} left={340} top={568} width={520} />
+      <FeedbackModal
+        feedback={fb.feedback}
+        onClose={() => {
+          if (!fb.isOpen) return;
+          const wasWrong = fb.feedback?.tone === "wrong";
+          fb.close();
+          if (wasWrong) setWrongOption(null);
+        }}
+      />
     </ScreenFrame>
   );
 }

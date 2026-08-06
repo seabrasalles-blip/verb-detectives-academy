@@ -51,21 +51,14 @@ export function Screen12Sorting() {
           title: "Caso resolvido",
         });
       } else {
-        fb.ok(
-          group === "base"
-            ? `Isso! ${word} usa go ou play.`
-            : `Isso! ${word} usa goes ou plays.`,
-        );
+        fb.ok(group === "base" ? `Isso! ${word} usa go ou play.` : `Isso! ${word} usa goes ou plays.`);
       }
     } else {
       // O card volta para a bandeja: nada é movido.
       registerMiss();
       const next = misses + 1;
       setMisses(next);
-      const specific =
-        group === "s"
-          ? "I, you, we e they usam go/play."
-          : "He, she e it usam goes/plays.";
+      const specific = group === "s" ? "I, you, we e they usam go/play." : "He, she e it usam goes/plays.";
       const general =
         group === "s"
           ? "Esse sujeito pertence ao grupo que usa a forma básica do verbo."
@@ -79,7 +72,7 @@ export function Screen12Sorting() {
       <CharacterLayer pose="pointing" placement="activityPointing" height={300} bottom={132} />
 
       <Instruction top={16} width={860}>
-        Toque em um sujeito e depois no grupo certo (ou arraste o card até o grupo).
+        Arraste o card até o grupo correto.
       </Instruction>
 
       {BOXES.map((box) => (

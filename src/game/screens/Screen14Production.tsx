@@ -1,5 +1,5 @@
 import { AudioButton } from "@/components/game/AudioButton";
-import { FeedbackModal, useFeedback } from "@/components/game/FeedbackModal";
+import { FeedbackModal, FeedbackSlot, useFeedback } from "@/components/game/FeedbackModal";
 import { Instruction } from "@/components/game/Instruction";
 import { ProgressMarker } from "@/components/game/ProgressMarker";
 import { ScreenFrame } from "@/components/game/ScreenFrame";
@@ -14,7 +14,10 @@ type Task = {
   answer: string[];
   roles: Role[];
   success: string;
+  /** Primeira tentativa: orientação geral por tipo de problema. */
   errors: Record<string, string>;
+  /** A partir da segunda tentativa: pista mais específica. */
+  errors2: Record<string, string>;
 };
 
 const TASKS: Task[] = [
@@ -24,10 +27,15 @@ const TASKS: Task[] = [
     cards: ["She", "They", "play", "plays", "soccer"],
     answer: ["She", "plays", "soccer"],
     roles: ["subject", "verb", "complement"],
-    success: "Frase montada! She plays soccer.",
+    success: "Frase montada! She plays soccer. She é o sujeito e plays é o verbo.",
     errors: {
+      subject: "Observe a imagem. Há uma pessoa ou mais de uma?",
+      verb: "Observe o sujeito que você escolheu. O verbo combina com esse sujeito?",
+      complement: "O que falta para completar a ideia da frase?",
+    },
+    errors2: {
       subject: "Na imagem há uma menina só. Qual sujeito combina com ela?",
-      verb: "Com she, o verbo play recebe s.",
+      verb: "Com she, o verbo play muda.",
       complement: "Falta dizer o que ela joga.",
     },
   },
@@ -37,10 +45,15 @@ const TASKS: Task[] = [
     cards: ["He", "They", "go", "goes", "to school"],
     answer: ["They", "go", "to school"],
     roles: ["subject", "verb", "complement"],
-    success: "Frase montada! They go to school.",
+    success: "Frase montada! They go to school. They é o sujeito e go é o verbo.",
     errors: {
+      subject: "Observe a imagem. Há uma pessoa ou mais de uma?",
+      verb: "Observe o sujeito que você escolheu. O verbo combina com esse sujeito?",
+      complement: "O que falta para completar a ideia da frase?",
+    },
+    errors2: {
       subject: "Na imagem há duas crianças. Qual sujeito combina com elas?",
-      verb: "Com they, o verbo fica na forma básica.",
+      verb: "Com they, o verbo não muda.",
       complement: "Falta dizer para onde as crianças vão.",
     },
   },
@@ -59,6 +72,7 @@ export function Screen14Production() {
   const [slots, setSlots] = usePersistentState<(string | null)[]>("s14.slots", [null, null, null]);
   const [solved, setSolved] = usePersistentState<boolean>("s14.solved", false);
   const fb = useFeedback();
+  const [misses, setMisses] = usePersistentState<number>("s14.misses", 0);
 
   const index = Math.min(taskIndex, TASKS.length - 1);
   const task = TASKS[index]!;
@@ -68,7 +82,7 @@ export function Screen14Production() {
   const sentence = `${(slots[0] ?? "").toString()} ${(slots[1] ?? "").toString()} ${(slots[2] ?? "").toString()}.`;
 
   const place = (card: string) => {
-    if (solved) return;
+    if (solved || fb.isOpen) return;
     const free = slots.findIndex((s) => s === null);
     if (free === -1) return;
     const next = [...slots];
@@ -77,14 +91,14 @@ export function Screen14Production() {
   };
 
   const removeAt = (i: number) => {
-    if (solved) return;
+    if (solved || fb.isOpen) return;
     const next = [...slots];
     next[i] = null;
     setSlots(next);
   };
 
   const check = () => {
-    if (!full || solved) return;
+    if (!full || solved || fb.isOpen) return;
     const wrongAt = slots.findIndex((s, i) => s !== task.answer[i]);
     if (wrongAt === -1) {
       setSolved(true);
@@ -96,10 +110,15 @@ export function Screen14Production() {
         setTaskIndex(index + 1);
         setSlots([null, null, null]);
         setSolved(false);
+        setMisses(0);
       });
     } else {
       registerMiss();
-      fb.wrong(task.errors[task.roles[wrongAt] as Role] ?? "Revise a ordem das palavras.");
+      const next = misses + 1;
+      setMisses(next);
+      const role = task.roles[wrongAt] as Role;
+      const table = next >= 2 ? task.errors2 : task.errors;
+      fb.wrong(table[role] ?? "Vamos observar novamente a ordem das palavras.");
     }
   };
 
@@ -192,6 +211,7 @@ export function Screen14Production() {
         }
       />
 
+      <FeedbackSlot inline={fb.inline} left={400} top={566} width={520} />
       <FeedbackModal feedback={fb.feedback} onClose={fb.close} />
     </ScreenFrame>
   );

@@ -1,105 +1,180 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { LEX } from "@/game/assets";
 
-export type FeedbackTone = "clue" | "hypothesis" | "conclusion" | "correct" | "wrong";
+export type FeedbackTone = "hypothesis" | "wrong" | "correct" | "conclusion";
+export type InlineTone = "clue" | "correct" | "warn";
 
 export type Feedback = {
   tone: FeedbackTone;
   message: string;
-  /** Fecha sozinho depois de alguns segundos (usado nos acertos). */
-  auto?: boolean;
+  /** Título opcional (sobrepõe o título padrão do tom). */
+  title?: string;
+  /** Rótulo opcional do botão. */
+  action?: string;
 } | null;
 
-const AUTO_MS = 2800;
+export type InlineFeedback = {
+  tone: InlineTone;
+  message: string;
+  /** Muda a cada chamada: reinicia a animação e o temporizador. */
+  id: number;
+} | null;
 
-const TONE = {
-  clue: {
-    kicker: "Pista",
-    color: "#2A7FB0",
-    border: "#52B7E8",
-    pose: "pointing" as const,
-    alt: "Lex apontando para a pista encontrada",
-    action: "Continuar",
-  },
+const INLINE_MS = 2200;
+
+const TONE: Record<
+  FeedbackTone,
+  { title: string; color: string; border: string; pose: keyof typeof LEX; alt: string; action: string }
+> = {
   hypothesis: {
-    kicker: "Hipótese",
-    color: "#5B45A8",
+    title: "Nossa hipótese",
+    color: "#4B3B8F",
     border: "#A995E8",
-    pose: "thinking" as const,
+    pose: "thinking",
     alt: "Lex pensando sobre a hipótese",
     action: "Vamos testar",
   },
-  conclusion: {
-    kicker: "Conclusão",
-    color: "#2C9C86",
-    border: "#58CDB5",
-    pose: "celebrating" as const,
-    alt: "Lex comemorando a conclusão",
-    action: "Continuar",
+  wrong: {
+    title: "Vamos olhar de novo",
+    color: "#B93B2B",
+    border: "#FF786A",
+    pose: "thinking",
+    alt: "Lex pensando junto com você",
+    action: "Tentar novamente",
   },
   correct: {
-    kicker: "Caso resolvido",
-    color: "#2C9C86",
+    title: "Muito bem!",
+    color: "#1F7A67",
     border: "#58CDB5",
-    pose: "celebrating" as const,
+    pose: "celebrating",
     alt: "Lex comemorando o acerto",
     action: "Continuar",
   },
-  wrong: {
-    kicker: "Vamos olhar de novo",
-    color: "#D9503F",
-    border: "#FF786A",
-    pose: "thinking" as const,
-    alt: "Lex pensando junto com você",
-    action: "Tentar de novo",
+  conclusion: {
+    title: "Descoberta confirmada",
+    color: "#1F7A67",
+    border: "#58CDB5",
+    pose: "celebrating",
+    alt: "Lex comemorando a descoberta",
+    action: "Continuar",
   },
-} satisfies Record<FeedbackTone, unknown> as Record<
-  FeedbackTone,
-  { kicker: string; color: string; border: string; pose: keyof typeof LEX; alt: string; action: string }
->;
+};
 
+const INLINE_STYLE: Record<InlineTone, { border: string; bg: string; color: string }> = {
+  clue: { border: "#52B7E8", bg: "#E4F4FF", color: "#1F6D96" },
+  correct: { border: "#58CDB5", bg: "#E8FBF5", color: "#1F7A67" },
+  warn: { border: "#FFD76A", bg: "#FFF6DF", color: "#7A4E00" },
+};
+
+type Options = { title?: string; action?: string };
+
+/**
+ * Dois níveis de feedback:
+ * - inline (pistas e microconfirmações): não bloqueia, some sozinho;
+ * - modal (hipótese, erro, acerto, conclusão): bloqueia e exige um clique.
+ */
 export function useFeedback() {
   const [feedback, setFeedback] = useState<Feedback>(null);
-  const timer = useRef<number | undefined>(undefined);
+  const [inline, setInline] = useState<InlineFeedback>(null);
+  const inlineTimer = useRef<number | undefined>(undefined);
+  const counter = useRef(0);
   const onDoneRef = useRef<(() => void) | undefined>(undefined);
+  const closingRef = useRef(false);
 
-  useEffect(() => () => window.clearTimeout(timer.current), []);
+  useEffect(() => () => window.clearTimeout(inlineTimer.current), []);
 
   const close = useCallback(() => {
-    window.clearTimeout(timer.current);
-    setFeedback(null);
+    // Executa o callback exatamente uma vez, mesmo com cliques repetidos.
+    if (closingRef.current) return;
+    closingRef.current = true;
     const done = onDoneRef.current;
     onDoneRef.current = undefined;
+    setFeedback(null);
     done?.();
+    closingRef.current = false;
   }, []);
 
   const show = useCallback(
-    (tone: FeedbackTone, message: string, onDone?: () => void, auto = false) => {
-      window.clearTimeout(timer.current);
-      onDoneRef.current = onDone;
-      setFeedback({ tone, message, auto });
-      if (auto) {
-        timer.current = window.setTimeout(() => {
-          setFeedback(null);
-          const done = onDoneRef.current;
-          onDoneRef.current = undefined;
-          done?.();
-        }, AUTO_MS);
-      }
+    (tone: FeedbackTone, message: string, onDone?: () => void, options?: Options) => {
+      setFeedback((current) => {
+        // Impede que um segundo feedback substitua o que já está aberto.
+        if (current) return current;
+        onDoneRef.current = onDone;
+        return {
+          tone,
+          message,
+          ...(options?.title ? { title: options.title } : {}),
+          ...(options?.action ? { action: options.action } : {}),
+        };
+      });
     },
     [],
   );
 
+  const showInline = useCallback((tone: InlineTone, message: string) => {
+    window.clearTimeout(inlineTimer.current);
+    counter.current += 1;
+    setInline({ tone, message, id: counter.current });
+    inlineTimer.current = window.setTimeout(() => setInline(null), INLINE_MS);
+  }, []);
+
   return {
     feedback,
+    inline,
+    isOpen: feedback !== null,
     close,
     show,
-    clue: (message: string, onDone?: () => void) => show("clue", message, onDone),
-    hypothesis: (message: string, onDone?: () => void) => show("hypothesis", message, onDone),
-    conclusion: (message: string, onDone?: () => void) => show("conclusion", message, onDone),
-    correct: (message: string, onDone?: () => void) => show("correct", message, onDone, true),
-    wrong: (message: string) => show("wrong", message),
+    showInline,
+    /** Pista curta, sempre inline. */
+    clue: (message: string) => showInline("clue", message),
+    /** Microconfirmação inline. */
+    ok: (message: string) => showInline("correct", message),
+    /** Orientação curta inline (sem bloquear). */
+    nudge: (message: string) => showInline("warn", message),
+    hypothesis: (message: string, onDone?: () => void, options?: Options) =>
+      show("hypothesis", message, onDone, options),
+    conclusion: (message: string, onDone?: () => void, options?: Options) =>
+      show("conclusion", message, onDone, options),
+    correct: (message: string, onDone?: () => void, options?: Options) =>
+      show("correct", message, onDone, options),
+    wrong: (message: string, options?: Options) => show("wrong", message, undefined, options),
   };
+}
+
+/** Área reservada de feedback inline: altura estável para não deslocar o layout. */
+export function FeedbackSlot({
+  inline,
+  left = 300,
+  top = 572,
+  width = 600,
+  className = "",
+}: {
+  inline: InlineFeedback;
+  left?: number;
+  top?: number;
+  width?: number;
+  className?: string;
+}) {
+  const style = inline ? INLINE_STYLE[inline.tone] : null;
+  return (
+    <div
+      className={`absolute flex items-center justify-center ${className}`}
+      style={{ left, top, width, height: 62 }}
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    >
+      {inline && style && (
+        <p
+          key={inline.id}
+          className="flex min-h-[54px] items-center rounded-full border-4 px-6 text-center text-[20px] leading-tight font-bold motion-safe:animate-[wv-rise_220ms_ease-out]"
+          style={{ borderColor: style.border, backgroundColor: style.bg, color: style.color }}
+        >
+          {inline.message}
+        </p>
+      )}
+    </div>
+  );
 }
 
 export function FeedbackModal({
@@ -109,12 +184,15 @@ export function FeedbackModal({
   feedback: Feedback;
   onClose: () => void;
 }) {
-  const dialogRef = useRef<HTMLDivElement>(null);
   const actionRef = useRef<HTMLButtonElement>(null);
   const previousFocus = useRef<HTMLElement | null>(null);
+  const clicked = useRef(false);
+  const titleId = useId();
+  const descId = useId();
 
   useEffect(() => {
     if (!feedback) return;
+    clicked.current = false;
     previousFocus.current = document.activeElement as HTMLElement | null;
     actionRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
@@ -129,73 +207,70 @@ export function FeedbackModal({
         actionRef.current?.focus();
       }
     };
-    document.addEventListener("keydown", onKey);
+    document.addEventListener("keydown", onKey, true);
     return () => {
-      document.removeEventListener("keydown", onKey);
-      previousFocus.current?.focus?.();
+      document.removeEventListener("keydown", onKey, true);
+      const previous = previousFocus.current;
+      // Só devolve o foco se o elemento anterior ainda existir e estiver ativo.
+      if (previous && previous.isConnected && !(previous as HTMLButtonElement).disabled) {
+        previous.focus?.();
+      }
     };
   }, [feedback, onClose]);
 
+  if (!feedback) return null;
+
+  const tone = TONE[feedback.tone];
+
+  const handleClose = () => {
+    if (clicked.current) return;
+    clicked.current = true;
+    onClose();
+  };
+
   return (
-    <>
-      <div className="sr-only" aria-live="assertive" role="status">
-        {feedback ? `${TONE[feedback.tone].kicker}. ${feedback.message}` : ""}
-      </div>
-      {feedback && (
-        <div
-          className="absolute inset-0 z-50 flex items-end justify-center bg-[#183B4A]/25 pb-[70px] motion-safe:animate-[wv-fade_200ms_ease-out]"
-          onPointerDown={(e) => {
-            // Bloqueia qualquer interação com o fundo.
-            e.stopPropagation();
-          }}
+    <div
+      className="absolute inset-0 z-50 flex items-center justify-center bg-[#183B4A]/[0.34] motion-safe:animate-[wv-fade_200ms_ease-out]"
+      onPointerDown={(e) => e.stopPropagation()}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        aria-describedby={descId}
+        className="flex w-[520px] max-w-[520px] min-w-[400px] flex-col items-center gap-2 rounded-[26px] border-[5px] bg-[#FFFDF6] px-9 py-6 text-center shadow-[0_12px_32px_rgba(24,59,74,0.30)] motion-safe:animate-[wv-rise_220ms_ease-out]"
+        style={{ borderColor: tone.border }}
+      >
+        <img
+          src={LEX[tone.pose]}
+          alt={tone.alt}
+          className="h-[140px] w-auto shrink-0 select-none"
+          draggable={false}
+        />
+        <p
+          id={titleId}
+          className="font-display text-[18px] font-extrabold tracking-[0.12em] uppercase"
+          style={{ color: tone.color }}
         >
-          <div
-            ref={dialogRef}
-            role="dialog"
-            aria-modal="true"
-            aria-label={TONE[feedback.tone].kicker}
-            className={`flex max-w-[820px] items-center gap-5 rounded-[26px] border-[5px] bg-[#FFFDF6] py-4 pr-7 pl-5 shadow-[0_10px_30px_rgba(24,59,74,0.28)] ${
-              feedback.tone === "wrong"
-                ? "motion-safe:animate-[wv-shake_320ms_ease-out]"
-                : "motion-safe:animate-[wv-bounce_420ms_ease-out]"
-            }`}
-            style={{ borderColor: TONE[feedback.tone].border }}
-          >
-            <img
-              src={LEX[TONE[feedback.tone].pose]}
-              alt={TONE[feedback.tone].alt}
-              className="h-[168px] w-auto shrink-0 select-none"
-              draggable={false}
-            />
-            <div>
-              <p
-                className="font-display text-[17px] font-extrabold tracking-[0.14em] uppercase"
-                style={{ color: TONE[feedback.tone].color }}
-              >
-                {TONE[feedback.tone].kicker}
-              </p>
-              <p className="mt-1 max-w-[520px] text-[24px] leading-snug font-semibold text-[#183B4A]">
-                {feedback.message}
-              </p>
-            </div>
-            {!feedback.auto && (
-              <button
-                ref={actionRef}
-                type="button"
-                onClick={onClose}
-                className="ml-2 shrink-0 cursor-pointer rounded-full border-4 px-6 py-3 text-[20px] font-extrabold transition-transform outline-none focus-visible:ring-4 focus-visible:ring-[#FFD76A] motion-safe:hover:scale-[1.04]"
-                style={{
-                  borderColor: TONE[feedback.tone].border,
-                  color: TONE[feedback.tone].color,
-                  backgroundColor: "#FFFDF6",
-                }}
-              >
-                {TONE[feedback.tone].action}
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-    </>
+          {feedback.title ?? tone.title}
+        </p>
+        <p
+          id={descId}
+          className="text-[23px] leading-[1.35] font-semibold text-balance text-[#183B4A]"
+        >
+          {feedback.message}
+        </p>
+        <button
+          ref={actionRef}
+          type="button"
+          onClick={handleClose}
+          className="mt-2 inline-flex min-h-[54px] min-w-[180px] cursor-pointer items-center justify-center rounded-full border-4 px-8 text-[20px] font-extrabold transition-transform outline-none focus-visible:ring-4 focus-visible:ring-[#FFD76A] motion-safe:hover:scale-[1.03]"
+          style={{ borderColor: tone.border, color: tone.color, backgroundColor: "#FFFDF6" }}
+        >
+          {feedback.action ?? tone.action}
+        </button>
+      </div>
+    </div>
   );
 }

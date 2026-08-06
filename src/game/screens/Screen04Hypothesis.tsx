@@ -1,5 +1,5 @@
 import { CharacterLayer } from "@/components/game/CharacterLayer";
-import { FeedbackModal, useFeedback } from "@/components/game/FeedbackModal";
+import { FeedbackModal, FeedbackSlot, useFeedback } from "@/components/game/FeedbackModal";
 import { Instruction } from "@/components/game/Instruction";
 import { Note } from "@/components/game/Note";
 import { ScreenFrame } from "@/components/game/ScreenFrame";
@@ -16,24 +16,19 @@ export function Screen04Hypothesis() {
   const done = isDone(4);
 
   const tap = (word: string) => {
+    if (fb.isOpen || done) return;
     if (word === "go") {
       if (!found.includes("go")) setFound([...found, "go"]);
-      fb.clue("Boa pista! Você escolheu a palavra que mostra a ação.", () =>
-        fb.hypothesis(
-          "Talvez o verbo mude por causa do sujeito. Vamos testar essa hipótese.",
-          () => complete(4),
-        ),
-      );
+      // Um único modal: a pista fica registrada na nota da própria tela.
+      fb.hypothesis("Talvez o verbo mude por causa do sujeito.", () => complete(4));
       return;
     }
     if (word === "He") {
       if (!found.includes("He")) setFound([...found, "He"]);
-      fb.clue(
-        "Você encontrou quem realiza a ação. He é o sujeito. Agora procure a palavra que mostra a ação.",
-      );
+      fb.clue("Isso! He é o sujeito. Agora procure a palavra que mostra a ação.");
       return;
     }
-    fb.clue("Essa palavra completa a ideia. Procure a palavra que mostra a ação.");
+    fb.clue("Essa parte completa a ideia. Procure a palavra que mostra a ação.");
   };
 
   const roleOf = (word: string) => {
@@ -72,6 +67,7 @@ export function Screen04Hypothesis() {
         </Note>
       )}
 
+      <FeedbackSlot inline={fb.inline} />
       <FeedbackModal feedback={fb.feedback} onClose={fb.close} />
     </ScreenFrame>
   );

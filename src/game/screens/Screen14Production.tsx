@@ -23,7 +23,7 @@ type Task = {
 const TASKS: Task[] = [
   {
     image: SCENE.girlSoccer,
-    alt: "Uma menina jogando futebol",
+    alt: "Uma menina conduzindo uma bola de futebol.",
     cards: ["She", "They", "play", "plays", "soccer"],
     answer: ["She", "plays", "soccer"],
     roles: ["subject", "verb", "complement"],

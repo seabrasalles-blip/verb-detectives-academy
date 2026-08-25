@@ -1,17 +1,22 @@
 import { AudioButton } from "@/components/game/AudioButton";
 import { CharacterLayer } from "@/components/game/CharacterLayer";
 import { DialogueBubble } from "@/components/game/DialogueBubble";
+import { FlowActionButton } from "@/components/game/FlowActionButton";
 import { ScreenFrame } from "@/components/game/ScreenFrame";
 import { SuspectPoster } from "@/components/game/Sentence";
 import { BG } from "@/game/assets";
 import { useGame } from "@/game/state";
 
 export function Screen03Poster() {
-  const { complete, isDone } = useGame();
-  const found = isDone(3);
+  const { complete, next } = useGame();
+
+  const investigate = () => {
+    complete(3);
+    next();
+  };
 
   return (
-    <ScreenFrame background={BG.investigation} nextEnabled={found}>
+    <ScreenFrame background={BG.investigation} showNext={false}>
       <CharacterLayer pose="thinking" placement="narrativeThinking" />
 
       <DialogueBubble style={{ left: 286, top: 34, width: 690 }}>

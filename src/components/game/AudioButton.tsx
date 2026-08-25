@@ -15,9 +15,18 @@ type Props = {
   disabled?: boolean;
   /** Variante compacta: fica ao lado da frase, não no rodapé. */
   compact?: boolean;
+  /** "footer-center": controle global do rodapé, centralizado no canvas (x=600). */
+  placement?: "footer-center" | "custom";
   className?: string;
   style?: CSSProperties;
 };
+
+/** Métricas do áudio quando ele é o controle central do rodapé. */
+const FOOTER_AUDIO = {
+  centerX: 600,
+  bottom: 20,
+  width: 158,
+} as const;
 
 /** Lê em voz alta apenas frases completas e corretas em inglês. */
 export function AudioButton({
@@ -30,11 +39,13 @@ export function AudioButton({
   bottom,
   disabled = false,
   compact = false,
+  placement = "custom",
   className = "",
   style,
 }: Props) {
   const [speaking, setSpeaking] = useState(false);
-  const finalWidth = width ?? (compact ? 112 : 158);
+  const footer = placement === "footer-center";
+  const finalWidth = footer ? (width ?? FOOTER_AUDIO.width) : (width ?? (compact ? 112 : 158));
   const finalBottom = top === undefined && bottom === undefined ? 24 : bottom;
 
   useEffect(() => {
@@ -42,11 +53,17 @@ export function AudioButton({
     return () => stopSpeaking();
   }, [text]);
 
+  const positionStyle: CSSProperties = footer
+    ? {
+        left: FOOTER_AUDIO.centerX,
+        bottom: FOOTER_AUDIO.bottom,
+        transform: "translateX(-50%)",
+        width: finalWidth,
+      }
+    : { left, right, top, bottom: finalBottom, width: finalWidth };
+
   return (
-    <div
-      className={`absolute ${className}`}
-      style={{ left, right, top, bottom: finalBottom, width: finalWidth, ...style }}
-    >
+    <div className={`absolute ${className}`} style={{ ...positionStyle, ...style }}>
       <AssetButton
         src={BTN.audio}
         width={finalWidth}

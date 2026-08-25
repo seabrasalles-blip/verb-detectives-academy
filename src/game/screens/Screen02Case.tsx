@@ -6,7 +6,7 @@ import { BG } from "@/game/assets";
 const STEPS = [
   { en: "Observe", pt: "observar" },
   { en: "Find a clue", pt: "achar uma pista" },
-  { en: "Test your idea", pt: "testar a ideia" },
+  { en: "Test your idea", pt: "testar sua ideia" },
   { en: "Solve the case", pt: "resolver o caso" },
 ];
 

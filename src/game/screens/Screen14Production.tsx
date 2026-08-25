@@ -204,7 +204,7 @@ export function Screen14Production() {
           onClick={check}
           disabled={!full}
           aria-disabled={!full}
-          className="font-display absolute bottom-[36px] left-[430px] z-10 cursor-pointer rounded-full border-4 border-[#58CDB5] bg-[#E8FBF5] px-9 py-3 text-[24px] font-extrabold text-[#1F7A67] shadow-[0_5px_0_rgba(36,86,107,0.16)] outline-none focus-visible:ring-4 focus-visible:ring-[#FFD76A] disabled:cursor-not-allowed disabled:opacity-45 motion-safe:hover:-translate-y-[2px]"
+          className="font-display absolute bottom-[104px] left-[430px] z-10 cursor-pointer rounded-full border-4 border-[#58CDB5] bg-[#E8FBF5] px-9 py-3 text-[24px] font-extrabold text-[#1F7A67] shadow-[0_5px_0_rgba(36,86,107,0.16)] outline-none focus-visible:ring-4 focus-visible:ring-[#FFD76A] disabled:cursor-not-allowed disabled:opacity-45 motion-safe:hover:-translate-y-[2px]"
         >
           Conferir a frase
         </button>
@@ -212,7 +212,7 @@ export function Screen14Production() {
 
       <AudioButton
         text={solved ? sentence : ""}
-        left={210}
+        placement="footer-center"
         disabled={!solved}
         label={
           solved

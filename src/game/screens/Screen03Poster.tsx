@@ -31,15 +31,19 @@ export function Screen03Poster() {
         </p>
       </SuspectPoster>
 
-      <AudioButton text="He go to school." label="Ouvir a frase encontrada no cartaz." left={196} />
+      <AudioButton
+        text="He go to school."
+        label="Ouvir a frase encontrada no cartaz."
+        placement="footer-center"
+      />
 
-      <button
-        type="button"
-        onClick={() => complete(3)}
-        className="font-display absolute bottom-[36px] left-[420px] cursor-pointer rounded-full border-4 border-[#52B7E8] bg-[#FFFDF6] px-8 py-3 text-[24px] font-extrabold text-[#1F6D96] shadow-[0_5px_0_rgba(36,86,107,0.16)] outline-none focus-visible:ring-4 focus-visible:ring-[#FFD76A] motion-safe:hover:-translate-y-[2px]"
+      <FlowActionButton
+        onClick={investigate}
+        ariaLabel="Investigar a frase encontrada no cartaz"
+        style={{ right: 20, bottom: 20 }}
       >
-        {found ? "Vamos lá! ✓" : "Quero investigar!"}
-      </button>
+        Quero investigar!
+      </FlowActionButton>
     </ScreenFrame>
   );
 }

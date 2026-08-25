@@ -152,7 +152,7 @@ export function MeaningVerbScreen({
         </InvestigationStepButton>
       )}
 
-      <AudioButton text={phrase} left={220} label={audioLabel} />
+      <AudioButton text={phrase} placement="footer-center" label={audioLabel} />
     </ScreenFrame>
   );
 }

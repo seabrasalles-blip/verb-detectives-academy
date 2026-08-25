@@ -154,7 +154,7 @@ export function RoundPractice({
 
       <AudioButton
         text={fullSentence}
-        left={200}
+        placement="footer-center"
         disabled={!showAnswer}
         label={
           showAnswer

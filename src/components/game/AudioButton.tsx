@@ -15,9 +15,18 @@ type Props = {
   disabled?: boolean;
   /** Variante compacta: fica ao lado da frase, não no rodapé. */
   compact?: boolean;
+  /** "footer-center": controle global do rodapé, centralizado no canvas (x=600). */
+  placement?: "footer-center" | "custom";
   className?: string;
   style?: CSSProperties;
 };
+
+/** Métricas do áudio quando ele é o controle central do rodapé. */
+const FOOTER_AUDIO = {
+  centerX: 600,
+  bottom: 20,
+  width: 158,
+} as const;
 
 /** Lê em voz alta apenas frases completas e corretas em inglês. */
 export function AudioButton({

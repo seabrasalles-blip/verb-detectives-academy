@@ -1,5 +1,6 @@
 import { InlineAudioButton } from "@/components/game/AudioButton";
 import { CharacterLayer } from "@/components/game/CharacterLayer";
+import { FlowActionButton } from "@/components/game/FlowActionButton";
 import { FeedbackModal, FeedbackSlot, useFeedback } from "@/components/game/FeedbackModal";
 import { HintButton } from "@/components/game/HintButton";
 import { Panel } from "@/components/game/Panel";
@@ -7,6 +8,7 @@ import { ProgressMarker } from "@/components/game/ProgressMarker";
 import { ScreenFrame } from "@/components/game/ScreenFrame";
 import { WordOption } from "@/components/game/WordOption";
 import { BG, type LexPose } from "@/game/assets";
+import { stopSpeaking } from "@/game/speech";
 import { useGame, usePersistentState } from "@/game/state";
 import { useRef } from "react";
 
@@ -69,18 +71,9 @@ export function RoundPractice({
     if (option === round.answer) {
       setWrongOption(null);
       setRevealed(true);
-      fb.correct(round.success, () => {
-        if (safeIndex === rounds.length - 1) {
-          complete(screenNumber);
-          return;
-        }
-        setIndex(safeIndex + 1);
-        setRevealed(false);
-        setMisses(0);
-        resetAttempts();
-        // O foco vai para a nova frase, não para uma alternativa que mudou.
-        window.setTimeout(() => sentenceRef.current?.focus(), 0);
-      });
+      if (safeIndex === rounds.length - 1) complete(screenNumber);
+      // Fechar o feedback não avança a rodada: a criança ouve a frase e decide.
+      fb.correct(round.success);
     } else {
       registerMiss();
       setWrongOption(option);
@@ -90,7 +83,20 @@ export function RoundPractice({
     }
   };
 
+  const goToNextRound = () => {
+    if (!revealed || safeIndex >= rounds.length - 1 || fb.isOpen) return;
+    stopSpeaking();
+    setIndex(safeIndex + 1);
+    setRevealed(false);
+    setWrongOption(null);
+    setMisses(0);
+    resetAttempts();
+    window.setTimeout(() => sentenceRef.current?.focus(), 0);
+  };
+
   const lastDone = showAnswer && safeIndex === rounds.length - 1;
+  const showNextRound = revealed && safeIndex < rounds.length - 1;
+
 
   return (
     <ScreenFrame background={BG.activity} nextEnabled={done || lastDone}>
@@ -175,6 +181,16 @@ export function RoundPractice({
         compact
       />
 
+
+      {showNextRound && (
+        <FlowActionButton
+          onClick={goToNextRound}
+          ariaLabel="Avançar para a próxima rodada"
+          style={{ right: 20, bottom: 20 }}
+        >
+          Próxima rodada
+        </FlowActionButton>
+      )}
 
       <FeedbackSlot inline={fb.inline} left={340} top={568} width={520} />
       <FeedbackModal

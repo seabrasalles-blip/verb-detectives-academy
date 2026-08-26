@@ -30,6 +30,25 @@
   }
 }
 
+/* Sinaliza discretamente que o comando da tela mudou (uma única vez). */
+@keyframes wv-attention {
+  0% {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+  60% {
+    opacity: 1;
+    text-shadow: 0 0 10px rgba(255, 215, 106, 0.75);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    text-shadow: none;
+  }
+}
+
+
+
 @keyframes wv-fade {
   from {
     opacity: 0;

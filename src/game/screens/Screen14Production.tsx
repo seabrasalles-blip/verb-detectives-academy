@@ -1,4 +1,4 @@
-import { AudioButton } from "@/components/game/AudioButton";
+import { InlineAudioButton } from "@/components/game/AudioButton";
 import { FeedbackModal, FeedbackSlot, useFeedback } from "@/components/game/FeedbackModal";
 import { Instruction } from "@/components/game/Instruction";
 import { ProgressMarker } from "@/components/game/ProgressMarker";
@@ -210,9 +210,12 @@ export function Screen14Production() {
         </button>
       )}
 
-      <AudioButton
+      {/* Áudio da frase montada, junto da área dos slots. */}
+      <InlineAudioButton
         text={solved ? sentence : ""}
-        placement="footer-center"
+        left={430}
+        top={330}
+        width={112}
         disabled={!solved}
         label={
           solved
@@ -220,6 +223,7 @@ export function Screen14Production() {
             : "O áudio fica disponível depois que a frase estiver correta"
         }
       />
+
 
       <FeedbackSlot inline={fb.inline} left={470} top={430} width={620} />
       <FeedbackModal feedback={fb.feedback} onClose={fb.close} />

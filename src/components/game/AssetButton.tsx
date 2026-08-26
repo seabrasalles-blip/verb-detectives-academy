@@ -9,6 +9,8 @@ type Props = {
   style?: CSSProperties;
   className?: string;
   floating?: boolean;
+  /** Escala aplicada apenas ao desenho interno (compensa margens do PNG). */
+  visualScale?: number;
 };
 
 /**
@@ -24,6 +26,7 @@ export function AssetButton({
   style,
   className = "",
   floating = false,
+  visualScale = 1,
 }: Props) {
   return (
     <button
@@ -43,7 +46,9 @@ export function AssetButton({
         aria-hidden="true"
         draggable={false}
         className="pointer-events-none block w-full select-none transition-[filter] duration-200 group-hover:brightness-[1.06] group-disabled:brightness-100 group-disabled:saturate-[0.65]"
+        style={visualScale === 1 ? undefined : { transform: `scale(${visualScale})` }}
       />
     </button>
   );
 }
+

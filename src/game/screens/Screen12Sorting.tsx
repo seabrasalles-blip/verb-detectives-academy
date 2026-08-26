@@ -10,15 +10,17 @@ import { useGame, usePersistentState } from "@/game/state";
 
 type Group = "base" | "s";
 
+/** Ordem propositalmente misturada: evita perceber os grupos pela sequência. */
 const SUBJECTS: { word: string; group: Group }[] = [
   { word: "I", group: "base" },
-  { word: "You", group: "base" },
-  { word: "We", group: "base" },
+  { word: "She", group: "s" },
   { word: "They", group: "base" },
   { word: "He", group: "s" },
-  { word: "She", group: "s" },
+  { word: "You", group: "base" },
   { word: "It", group: "s" },
+  { word: "We", group: "base" },
 ];
+
 
 const BOXES: { group: Group; title: string; color: string; left: number }[] = [
   { group: "base", title: "GO / PLAY", color: "#52B7E8", left: 300 },
@@ -159,8 +161,12 @@ export function Screen12Sorting() {
         hint="Pense em quantas pessoas o sujeito representa."
         strongHint="He, she e it ficam em goes/plays. I, you, we e they ficam em go/play."
         attempts={attempts}
-        left={200}
+        right={18}
+        top={18}
+        width={132}
+        compact
       />
+
 
       <FeedbackSlot inline={fb.inline} left={330} top={566} width={540} />
       <FeedbackModal feedback={fb.feedback} onClose={fb.close} />

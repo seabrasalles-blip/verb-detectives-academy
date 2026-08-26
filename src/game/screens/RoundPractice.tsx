@@ -1,4 +1,4 @@
-import { AudioButton } from "@/components/game/AudioButton";
+import { InlineAudioButton } from "@/components/game/AudioButton";
 import { CharacterLayer } from "@/components/game/CharacterLayer";
 import { FeedbackModal, FeedbackSlot, useFeedback } from "@/components/game/FeedbackModal";
 import { HintButton } from "@/components/game/HintButton";

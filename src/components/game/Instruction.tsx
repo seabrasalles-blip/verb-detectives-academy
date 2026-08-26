@@ -4,11 +4,14 @@ export function Instruction({
   top = 18,
   width = 760,
   minHeight = 62,
+  attentionKey,
 }: {
   children: React.ReactNode;
   top?: number;
   width?: number;
   minHeight?: number;
+  /** Ao mudar, o conteúdo executa uma microanimação única indicando novo comando. */
+  attentionKey?: string | number;
 }) {
   return (
     <div
@@ -22,7 +25,12 @@ export function Instruction({
       }}
     >
       <p
-        className="line-clamp-2 text-center text-[23px] leading-[1.2] font-bold text-[#183B4A]"
+        key={attentionKey ?? "static"}
+        className={`line-clamp-2 text-center text-[23px] leading-[1.2] font-bold text-[#183B4A] ${
+          attentionKey === undefined
+            ? ""
+            : "motion-safe:animate-[wv-attention_420ms_ease-out_1]"
+        }`}
         style={{ maxHeight: 56 }}
       >
         {children}

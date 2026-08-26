@@ -152,9 +152,12 @@ export function RoundPractice({
         ))}
       </div>
 
-      <AudioButton
-        text={fullSentence}
-        placement="footer-center"
+      {/* Áudio junto ao painel da frase; nunca antecipa a resposta. */}
+      <InlineAudioButton
+        text={showAnswer ? fullSentence : ""}
+        left={976}
+        top={236}
+        width={112}
         disabled={!showAnswer}
         label={
           showAnswer
@@ -162,7 +165,16 @@ export function RoundPractice({
             : "O áudio da frase completa fica disponível depois da resposta correta"
         }
       />
-      <HintButton hint={hint} strongHint={strongHint} attempts={attempts} left={370} />
+      <HintButton
+        hint={hint}
+        strongHint={strongHint}
+        attempts={attempts}
+        right={20}
+        top={58}
+        width={132}
+        compact
+      />
+
 
       <FeedbackSlot inline={fb.inline} left={340} top={568} width={520} />
       <FeedbackModal

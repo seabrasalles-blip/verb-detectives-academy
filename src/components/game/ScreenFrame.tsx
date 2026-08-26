@@ -48,7 +48,6 @@ export function ScreenFrame({
         <AssetButton
           src={BTN.back}
           width={NAV_BUTTON_SIZE.back}
-          visualScale={1.1}
           label="Voltar para a tela anterior"
           onClick={back}
           style={{ left: NAV_BUTTON_POSITION.side, bottom: NAV_BUTTON_POSITION.bottom }}

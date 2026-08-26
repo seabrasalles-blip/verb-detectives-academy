@@ -210,19 +210,19 @@ export function Screen14Production() {
         </button>
       )}
 
-      {/* Áudio da frase montada, junto da área dos slots. */}
-      <InlineAudioButton
-        text={solved ? sentence : ""}
-        left={430}
-        top={330}
-        width={112}
-        disabled={!solved}
-        label={
-          solved
-            ? `Ouvir a frase montada: ${sentence}`
-            : "O áudio fica disponível depois que a frase estiver correta"
-        }
-      />
+      {/* Áudio só depois do acerto, colado à direita da linha dos slots. */}
+      {solved && (
+        <InlineAudioButton
+          text={sentence}
+          left={1090}
+          top={106}
+          width={96}
+          className="motion-safe:animate-[wv-rise_300ms_ease-out]"
+          label={`Ouvir a frase montada: ${sentence}`}
+        />
+      )}
+
+
 
 
       <FeedbackSlot inline={fb.inline} left={470} top={430} width={620} />

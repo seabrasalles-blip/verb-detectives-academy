@@ -1,4 +1,4 @@
-import { AudioButton } from "@/components/game/AudioButton";
+import { InlineAudioButton } from "@/components/game/AudioButton";
 import { CharacterLayer } from "@/components/game/CharacterLayer";
 import { DialogueBubble } from "@/components/game/DialogueBubble";
 import { FlowActionButton } from "@/components/game/FlowActionButton";
@@ -31,11 +31,14 @@ export function Screen03Poster() {
         </p>
       </SuspectPoster>
 
-      <AudioButton
+      <InlineAudioButton
         text="He go to school."
         label="Ouvir a frase encontrada no cartaz."
-        placement="footer-center"
+        left={930}
+        top={300}
+        width={112}
       />
+
 
       <FlowActionButton
         onClick={investigate}

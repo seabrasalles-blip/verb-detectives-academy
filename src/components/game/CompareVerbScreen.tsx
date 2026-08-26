@@ -193,7 +193,21 @@ export function CompareVerbScreen({
     </div>
   );
 
+  const instructionText =
+    analyzePhase && analyzeModel
+      ? modelDone
+        ? analyzeModel.instruction
+        : analyzeModel.prompts[Math.min(modelStep, 2) as 0 | 1 | 2]
+      : rulePhase
+        ? ruleTitle
+        : revealed
+          ? "Descobrimos o que mudou nas duas frases."
+          : stepsDone
+            ? "O que mudou entre as duas frases?"
+            : current.prompt;
+
   return (
+
     <ScreenFrame background={BG.activity} showNext={revealed} nextEnabled={revealed}>
       {rulePhase ? (
         <CharacterLayer pose="pointing" placement="rulePointing" />

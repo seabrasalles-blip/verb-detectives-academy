@@ -10,15 +10,17 @@ import { useGame, usePersistentState } from "@/game/state";
 
 type Group = "base" | "s";
 
+/** Ordem propositalmente misturada: evita perceber os grupos pela sequência. */
 const SUBJECTS: { word: string; group: Group }[] = [
   { word: "I", group: "base" },
-  { word: "You", group: "base" },
-  { word: "We", group: "base" },
+  { word: "She", group: "s" },
   { word: "They", group: "base" },
   { word: "He", group: "s" },
-  { word: "She", group: "s" },
+  { word: "You", group: "base" },
   { word: "It", group: "s" },
+  { word: "We", group: "base" },
 ];
+
 
 const BOXES: { group: Group; title: string; color: string; left: number }[] = [
   { group: "base", title: "GO / PLAY", color: "#52B7E8", left: 300 },

@@ -1,4 +1,4 @@
-import { AudioButton } from "@/components/game/AudioButton";
+import { InlineAudioButton } from "@/components/game/AudioButton";
 import { Instruction } from "@/components/game/Instruction";
 import { InvestigationStepButton } from "@/components/game/InvestigationStepButton";
 import { ScreenFrame } from "@/components/game/ScreenFrame";

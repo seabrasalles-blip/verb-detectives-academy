@@ -1,5 +1,6 @@
 import { InlineAudioButton } from "@/components/game/AudioButton";
 import { CharacterLayer } from "@/components/game/CharacterLayer";
+import { FlowActionButton } from "@/components/game/FlowActionButton";
 import { FeedbackModal, FeedbackSlot, useFeedback } from "@/components/game/FeedbackModal";
 import { HintButton } from "@/components/game/HintButton";
 import { Panel } from "@/components/game/Panel";
@@ -7,6 +8,7 @@ import { ProgressMarker } from "@/components/game/ProgressMarker";
 import { ScreenFrame } from "@/components/game/ScreenFrame";
 import { WordOption } from "@/components/game/WordOption";
 import { BG, type LexPose } from "@/game/assets";
+import { stopSpeaking } from "@/game/speech";
 import { useGame, usePersistentState } from "@/game/state";
 import { useRef } from "react";
 
@@ -179,6 +181,16 @@ export function RoundPractice({
         compact
       />
 
+
+      {showNextRound && (
+        <FlowActionButton
+          onClick={goToNextRound}
+          ariaLabel="Avançar para a próxima rodada"
+          style={{ right: 20, bottom: 20 }}
+        >
+          Próxima rodada
+        </FlowActionButton>
+      )}
 
       <FeedbackSlot inline={fb.inline} left={340} top={568} width={520} />
       <FeedbackModal

@@ -77,7 +77,7 @@ export function MeaningVerbScreen({
 
   return (
     <ScreenFrame background={BG.activity} showNext={phase === maxPhase} nextEnabled={phase === maxPhase}>
-      <Instruction top={18} width={720}>
+      <Instruction top={18} width={720} attentionKey={phase}>
         {instructions[phase as MeaningPhase]}
       </Instruction>
 
@@ -98,38 +98,49 @@ export function MeaningVerbScreen({
 
       {/* Card único de conteúdo: verbo, frase, significado e tradução. */}
       <div
-        className="absolute flex flex-col justify-center rounded-[24px] border-4 border-[#52B7E8] px-8 py-6 shadow-[0_6px_0_rgba(36,86,107,0.12)]"
+        className="absolute flex flex-col justify-center rounded-[24px] border-4 border-[#52B7E8] px-7 py-5 shadow-[0_6px_0_rgba(36,86,107,0.12)]"
         style={{
-          left: 445,
+          left: 455,
           top: 120,
-          width: 640,
-          minHeight: phase === 0 ? 150 : phase === 2 ? 240 : 265,
+          width: 560,
+          minHeight: phase === 0 ? 145 : phase === 2 ? 220 : 235,
           backgroundColor: "#FFFDF6",
         }}
       >
-        {phase >= 1 && (
+        <div className="mx-auto w-full max-w-[430px]">
+          {phase >= 1 && (
+            <p
+              className="font-display text-[54px] leading-none font-extrabold text-[#FF786A] motion-safe:animate-[wv-rise_400ms_ease-out]"
+              lang="en"
+            >
+              {verb}
+            </p>
+          )}
           <p
-            className="font-display text-[56px] leading-none font-extrabold text-[#FF786A] motion-safe:animate-[wv-rise_400ms_ease-out]"
+            className={`text-[34px] leading-tight font-extrabold text-[#183B4A] ${phase >= 1 ? "mt-2.5" : ""}`}
             lang="en"
           >
-            {verb}
+            {phrase}
           </p>
-        )}
-        <p
-          className={`text-[36px] leading-tight font-extrabold text-[#183B4A] ${phase >= 1 ? "mt-3" : ""}`}
-          lang="en"
-        >
-          {phrase}
-        </p>
-        {phase >= 1 && (
-          <div className="mt-5 motion-safe:animate-[wv-rise_400ms_ease-out]">
-            <p className="text-[24px] leading-snug font-bold text-[#183B4A]">{meaning}</p>
-            <p className="mt-1.5 text-[23px] leading-snug font-semibold text-[#24566B]">
-              {translation}
-            </p>
-          </div>
-        )}
+          {phase >= 1 && (
+            <div className="mt-4 motion-safe:animate-[wv-rise_400ms_ease-out]">
+              <p className="text-[23px] leading-snug font-bold text-[#183B4A]">{meaning}</p>
+              <p className="mt-1.5 text-[22px] leading-snug font-semibold text-[#24566B]">
+                {translation}
+              </p>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Áudio junto ao card: o controle lê exatamente a frase exibida. */}
+      <InlineAudioButton
+        text={phrase}
+        label={audioLabel}
+        left={1032}
+        top={phase === 0 ? 158 : 205}
+        width={112}
+      />
 
 
       {withAnalysis && phase === 2 && (
@@ -151,8 +162,7 @@ export function MeaningVerbScreen({
           {phase === 0 ? "Descobrir o significado" : "Analisar a frase"}
         </InvestigationStepButton>
       )}
-
-      <AudioButton text={phrase} placement="footer-center" label={audioLabel} />
     </ScreenFrame>
   );
 }
+

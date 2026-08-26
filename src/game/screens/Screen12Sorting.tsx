@@ -161,8 +161,12 @@ export function Screen12Sorting() {
         hint="Pense em quantas pessoas o sujeito representa."
         strongHint="He, she e it ficam em goes/plays. I, you, we e they ficam em go/play."
         attempts={attempts}
-        left={200}
+        right={18}
+        top={18}
+        width={132}
+        compact
       />
+
 
       <FeedbackSlot inline={fb.inline} left={330} top={566} width={540} />
       <FeedbackModal feedback={fb.feedback} onClose={fb.close} />

@@ -21,21 +21,18 @@ export function Screen15Closing() {
 
       {/* Cabeçalho em faixa clara e opaca */}
       <div
-        className="absolute flex items-center gap-4 rounded-[26px] border-4 border-[#24566B] bg-[#FFFDF6] px-6 py-3 shadow-[0_4px_0_rgba(36,86,107,0.12)] motion-safe:animate-[wv-rise_450ms_ease-out]"
+        className="absolute flex flex-col items-center justify-center rounded-[26px] border-4 border-[#24566B] bg-[#FFFDF6] px-6 py-3 text-center shadow-[0_4px_0_rgba(36,86,107,0.12)] motion-safe:animate-[wv-rise_450ms_ease-out]"
         style={{ left: 64, top: 26, width: 736, height: 96 }}
       >
-        <DetectiveBadge />
-        <div className="flex-1 text-center">
-          <h2
-            lang="en"
-            className="font-display text-[48px] leading-none font-extrabold text-[#B93B2B]"
-          >
-            Case solved!
-          </h2>
-          <p className="mt-1 text-[26px] leading-none font-bold text-[#183B4A]">
-            Você se tornou um Verb Detective!
-          </p>
-        </div>
+        <h2
+          lang="en"
+          className="font-display text-[48px] leading-none font-extrabold text-[#B93B2B]"
+        >
+          Case solved!
+        </h2>
+        <p className="mt-1 text-[26px] leading-none font-bold text-[#183B4A]">
+          Você se tornou um Verb Detective!
+        </p>
       </div>
 
       {/* Painel único de síntese */}
@@ -43,7 +40,8 @@ export function Screen15Closing() {
         className="absolute rounded-[28px] border-4 border-[#52B7E8] bg-[#FFFDF6] p-7 shadow-[0_4px_0_rgba(36,86,107,0.10)] motion-safe:animate-[wv-rise_550ms_ease-out]"
         style={{ left: 64, top: 142, width: 736, height: 356 }}
       >
-        <div className="flex h-full flex-col justify-between">
+        <div className="flex h-full flex-col gap-[22px]">
+
           <div>
             <p className="text-[19px] font-bold text-[#24566B]">Você descobriu os verbos</p>
             <div className="mt-1 flex items-center gap-10">

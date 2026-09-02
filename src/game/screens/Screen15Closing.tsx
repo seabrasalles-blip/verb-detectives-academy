@@ -80,15 +80,14 @@ export function Screen15Closing() {
           </div>
 
           <div className="border-t-2 border-[#CBE6F5] pt-3">
-            <p className="text-[21px] leading-snug font-bold text-[#183B4A]">
-              <strong className="text-[#463089]">Sujeito:</strong> quem realiza a ação. ·{" "}
-              <strong className="text-[#B93B2B]">Verbo:</strong> a palavra que mostra a ação.
+            <p className="text-[21px] leading-snug font-bold text-[#24566B]">
+              <strong className="text-[#463089]">Sujeito:</strong> quem realiza a ação.
             </p>
-            <p className="text-[21px] leading-snug font-bold text-[#183B4A]">
-              Com <span lang="en">he</span>, <span lang="en">she</span> e <span lang="en">it</span>,
-              acrescentamos s; em <span lang="en">go</span>, acrescentamos es.
+            <p className="mt-[7px] text-[21px] leading-snug font-bold text-[#24566B]">
+              <strong className="text-[#FF786A]">Verbo:</strong> a palavra que mostra a ação.
             </p>
           </div>
+
         </div>
       </div>
 

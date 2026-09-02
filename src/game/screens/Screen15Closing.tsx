@@ -5,21 +5,6 @@ import { BG, BTN } from "@/game/assets";
 import { useGame } from "@/game/state";
 import { useEffect } from "react";
 
-/** Selo de conquista em HTML/CSS puro (sem asset novo, sem emoji). */
-function DetectiveBadge() {
-  return (
-    <div
-      className="flex h-[86px] w-[86px] shrink-0 flex-col items-center justify-center rounded-full border-4 border-[#52B7E8] bg-[#FFF3CC] text-center shadow-[0_3px_0_rgba(36,86,107,0.12)] motion-safe:animate-[wv-rise_600ms_ease-out]"
-      aria-hidden="true"
-    >
-      <span className="font-display text-[13px] leading-[1.05] font-extrabold tracking-wide text-[#24566B]">
-        VERB
-        <br />
-        DETECTIVE
-      </span>
-    </div>
-  );
-}
 
 export function Screen15Closing() {
   const { restart, finish } = useGame();

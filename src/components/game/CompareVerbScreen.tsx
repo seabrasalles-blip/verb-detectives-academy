@@ -210,7 +210,7 @@ export function CompareVerbScreen({
 
     <ScreenFrame background={BG.activity} showNext={revealed} nextEnabled={revealed}>
       {rulePhase ? (
-        <CharacterLayer pose="pointing" placement="rulePointing" />
+        <CharacterLayer pose="pointing" placement="rulePointing" flip transformOrigin="bottom center" />
       ) : (
         <CharacterLayer pose="thinking" placement="activityThinking" />
       )}

@@ -86,7 +86,14 @@ export function Screen04Hypothesis() {
 
   return (
     <ScreenFrame background={BG.investigation} nextEnabled={done}>
-      <CharacterLayer pose="pointing" placement="activityPointing" flip />
+      {/* Espelhada apenas aqui: o gesto passa a apontar para o cartaz/pistas. */}
+      <CharacterLayer
+        pose="pointing"
+        placement="activityPointing"
+        flip
+        transformOrigin="bottom center"
+      />
+
 
       <Instruction top={22} width={640} attentionKey={instruction}>
         {instruction}

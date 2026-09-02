@@ -71,7 +71,14 @@ export function Screen12Sorting() {
 
   return (
     <ScreenFrame background={BG.activity} nextEnabled={finished}>
-      <CharacterLayer pose="pointing" placement="activityPointing" height={300} bottom={132} />
+      <CharacterLayer
+        pose="pointing"
+        placement="activityPointing"
+        height={300}
+        bottom={132}
+        flip
+        transformOrigin="bottom center"
+      />
 
       <Instruction top={16} width={860}>
         Arraste o card até o grupo correto.
